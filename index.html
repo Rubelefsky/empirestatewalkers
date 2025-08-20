@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empire State Walkers - Professional Dog Walking Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-lg z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-dog text-2xl text-primary mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">Empire State Walkers</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#home" class="nav-link text-gray-700 hover:text-primary transition duration-300">Home</a>
+                    <a href="#about" class="nav-link text-gray-700 hover:text-primary transition duration-300">About</a>
+                    <a href="#services" class="nav-link text-gray-700 hover:text-primary transition duration-300">Services</a>
+                    <a href="#contact" class="nav-link text-gray-700 hover:text-primary transition duration-300">Contact</a>
+                    <a href="#booking" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Book Now</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-4 pt-2 pb-3 space-y-1">
+                <a href="#home" class="mobile-nav-link block px-3 py-2 text-gray-700">Home</a>
+                <a href="#about" class="mobile-nav-link block px-3 py-2 text-gray-700">About</a>
+                <a href="#services" class="mobile-nav-link block px-3 py-2 text-gray-700">Services</a>
+                <a href="#contact" class="mobile-nav-link block px-3 py-2 text-gray-700">Contact</a>
+                <a href="#booking" class="mobile-nav-link block px-3 py-2 text-primary font-semibold">Book Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    Professional Dog Walking Services in NYC
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+                    Reliable, loving care for your furry friends. We treat every dog like family.
+                </p>
+                <div class="space-x-4">
+                    <a href="#booking" class="bg-secondary text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-yellow-600 transition duration-300">
+                        Book a Walk
+                    </a>
+                    <a href="#services" class="border-2 border-white text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-800 transition duration-300">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">About Me</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Passionate about dogs and committed to providing the best care for your beloved pets
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Hi, I'm [Your Name]</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        With over 5 years of experience in pet care, I've dedicated my life to ensuring dogs get the exercise, 
+                        attention, and love they deserve. Growing up with dogs, I understand their unique personalities and needs.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed">
+                        I'm fully insured, bonded, and certified in pet first aid. Your dog's safety and happiness are my top priorities. 
+                        I provide personalized care for each furry client and send regular updates to keep you connected throughout the day.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-8">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <i class="fas fa-certificate text-2xl text-primary mb-2"></i>
+                            <h4 class="font-semibold">Certified</h4>
+                            <p class="text-sm text-gray-600">Pet First Aid</p>
+                        </div>
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <i class="fas fa-shield-alt text-2xl text-primary mb-2"></i>
+                            <h4 class="font-semibold">Insured</h4>
+                            <p class="text-sm text-gray-600">Fully Bonded</p>
+                        </div>
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <i class="fas fa-heart text-2xl text-primary mb-2"></i>
+                            <h4 class="font-semibold">5+ Years</h4>
+                            <p class="text-sm text-gray-600">Experience</p>
+                        </div>
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <i class="fas fa-mobile-alt text-2xl text-primary mb-2"></i>
+                            <h4 class="font-semibold">Updates</h4>
+                            <p class="text-sm text-gray-600">Real-time Photos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-gray-200 rounded-lg h-96 flex items-center justify-center mb-6">
+                        <div class="text-center text-gray-500">
+                            <i class="fas fa-user text-6xl mb-4"></i>
+                            <p>Your Professional Photo Here</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-4 text-2xl">
+                        <i class="fab fa-instagram text-pink-500 hover:text-pink-600 cursor-pointer"></i>
+                        <i class="fab fa-facebook text-blue-600 hover:text-blue-700 cursor-pointer"></i>
+                        <i class="fas fa-envelope text-gray-600 hover:text-gray-700 cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Our Services</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Tailored services to meet your dog's specific needs and your schedule
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="bg-white rounded-lg shadow-lg p-8 text-center hover:shadow-xl transition duration-300">
+                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-walking text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Daily Walks</h3>
+                    <p class="text-gray-600 mb-6">30-60 minute walks tailored to your dog's energy level and needs.</p>
+                    <ul class="text-left space-y-2 mb-6">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Customized route planning</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Real-time photo updates</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Flexible scheduling</li>
+                    </ul>
+                    <div class="text-2xl font-bold text-primary mb-4">$25-35/walk</div>
+                    <a href="#booking" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Book Now</a>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="bg-white rounded-lg shadow-lg p-8 text-center hover:shadow-xl transition duration-300">
+                    <div class="bg-secondary text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-home text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Pet Sitting</h3>
+                    <p class="text-gray-600 mb-6">In-home care while you're away, including feeding and companionship.</p>
+                    <ul class="text-left space-y-2 mb-6">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Medication administration</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Feeding & fresh water</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Playtime & attention</li>
+                    </ul>
+                    <div class="text-2xl font-bold text-primary mb-4">$40/visit</div>
+                    <a href="#booking" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Book Now</a>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="bg-white rounded-lg shadow-lg p-8 text-center hover:shadow-xl transition duration-300">
+                    <div class="bg-green-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Emergency Visits</h3>
+                    <p class="text-gray-600 mb-6">Same-day availability for urgent pet care needs.</p>
+                    <ul class="text-left space-y-2 mb-6">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Last-minute bookings</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Holiday coverage</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Emergency situations</li>
+                    </ul>
+                    <div class="text-2xl font-bold text-primary mb-4">$50/visit</div>
+                    <a href="#booking" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Book Now</a>
+                </div>
+            </div>
+
+            <!-- Additional Services -->
+            <div class="mt-16 bg-white rounded-lg shadow-lg p-8">
+                <h3 class="text-2xl font-bold text-gray-800 text-center mb-8">Additional Services</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <i class="fas fa-cut text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold mb-2">Basic Grooming</h4>
+                        <p class="text-gray-600 text-sm">Nail trimming, brushing</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-graduation-cap text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold mb-2">Basic Training</h4>
+                        <p class="text-gray-600 text-sm">Leash training, commands</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-car text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold mb-2">Transportation</h4>
+                        <p class="text-gray-600 text-sm">Vet visits, grooming</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-camera text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold mb-2">Photo Sessions</h4>
+                        <p class="text-gray-600 text-sm">Professional pet photos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Get In Touch</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Ready to give your dog the care they deserve? Contact me today!
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div class="space-y-8">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Phone</h3>
+                            <p class="text-gray-600">(555) 123-4567</p>
+                            <p class="text-sm text-gray-500">Available 7am - 9pm daily</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Email</h3>
+                            <p class="text-gray-600">hello@empirestatewalkers.com</p>
+                            <p class="text-sm text-gray-500">Response within 2 hours</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Service Area</h3>
+                            <p class="text-gray-600">Manhattan, NYC</p>
+                            <p class="text-sm text-gray-500">Upper East Side, Upper West Side, Midtown</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Why Choose Empire State Walkers?</h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Licensed & Insured</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 5-Star Reviews</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Real-time Updates</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Flexible Scheduling</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Emergency Availability</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Send a Message</h3>
+                    <form id="contact-form" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                <input type="text" id="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                <input type="text" id="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <input type="tel" id="phone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Service Needed</label>
+                            <select id="service" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="">Select a service</option>
+                                <option value="daily-walks">Daily Walks</option>
+                                <option value="pet-sitting">Pet Sitting</option>
+                                <option value="emergency">Emergency Visit</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea id="message" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tell me about your dog and what services you need..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Book Your Service</h2>
+                <p class="text-xl max-w-3xl mx-auto">
+                    Schedule a walk or pet sitting service for your furry friend today!
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-xl p-8 text-gray-800">
+                <form id="booking-form" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pet Owner Name *</label>
+                            <input type="text" id="ownerName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                            <input type="tel" id="ownerPhone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Dog's Name *</label>
+                            <input type="text" id="dogName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Dog's Breed</label>
+                            <input type="text" id="dogBreed" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Service Type *</label>
+                            <select id="bookingService" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="">Select service</option>
+                                <option value="30min-walk">30-min Walk ($25)</option>
+                                <option value="60min-walk">60-min Walk ($35)</option>
+                                <option value="pet-sitting">Pet Sitting ($40)</option>
+                                <option value="emergency">Emergency Visit ($50)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Date *</label>
+                            <input type="date" id="preferredDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Time *</label>
+                            <select id="preferredTime" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="">Select time</option>
+                                <option value="morning">Morning (7am-11am)</option>
+                                <option value="afternoon">Afternoon (12pm-4pm)</option>
+                                <option value="evening">Evening (5pm-8pm)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                        <input type="text" id="address" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Full address including apartment number">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                        <textarea id="instructions" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Any special needs, preferences, or instructions for your dog..."></textarea>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="terms" required class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                        <label for="terms" class="text-sm text-gray-600">
+                            I agree to the terms and conditions and authorize Empire State Walkers to provide services for my pet.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 text-lg">
+                        Submit Booking Request
+                    </button>
+                </form>
+            </div>
+
+            <div class="text-center mt-8 text-blue-100">
+                <p class="text-sm">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Booking requests will be confirmed within 2 hours during business hours.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-dog text-2xl text-primary mr-2"></i>
+                        <span class="text-xl font-bold">Empire State Walkers</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Professional dog walking and pet sitting services in Manhattan, NYC.</p>
+                    <div class="flex space-x-4">
+                        <i class="fab fa-instagram text-xl hover:text-primary cursor-pointer"></i>
+                        <i class="fab fa-facebook text-xl hover:text-primary cursor-pointer"></i>
+                        <i class="fas fa-envelope text-xl hover:text-primary cursor-pointer"></i>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Services</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#services" class="hover:text-white">Daily Walks</a></li>
+                        <li><a href="#services" class="hover:text-white">Pet Sitting</a></li>
+                        <li><a href="#services" class="hover:text-white">Emergency Visits</a></li>
+                        <li><a href="#services" class="hover:text-white">Additional Services</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#about" class="hover:text-white">About Me</a></li>
+                        <li><a href="#services" class="hover:text-white">Services</a></li>
+                        <li><a href="#contact" class="hover:text-white">Contact</a></li>
+                        <li><a href="#booking" class="hover:text-white">Book Now</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                    <div class="space-y-2 text-gray-400">
+                        <p><i class="fas fa-phone mr-2"></i>(555) 123-4567</p>
+                        <p><i class="fas fa-envelope mr-2"></i>help@esw.dog</p>
+                        <p><i class="fas fa-map-marker-alt mr-2"></i>Manhattan, NYC</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Empire State Walkers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
