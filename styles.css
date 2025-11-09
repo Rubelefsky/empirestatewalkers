@@ -203,3 +203,147 @@ textarea:focus {
         color: #f9fafb;
     }
 }
+
+/* Authentication Modal Styles */
+.modal-overlay {
+    backdrop-filter: blur(4px);
+}
+
+/* Booking card animations */
+.booking-card {
+    transition: all 0.3s ease;
+}
+
+.booking-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Dashboard stats animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-stat {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-upcoming {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-today {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-completed {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+/* Modal animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#login-modal > div,
+#register-modal > div {
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+/* Button hover effects */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Input focus effects */
+input:focus,
+select:focus,
+textarea:focus {
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+/* Dashboard grid responsiveness */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Notification animations */
+.notification-enter {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.notification-exit {
+    animation: slideOutRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Smooth scrolling for hash navigation */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Loading spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
