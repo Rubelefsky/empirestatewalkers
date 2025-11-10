@@ -6,12 +6,17 @@ const {
     updateDetails
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const {
+    registerValidation,
+    loginValidation,
+    updateDetailsValidation
+} = require('../middleware/validators');
 
 const router = express.Router();
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', registerValidation, register);
+router.post('/login', loginValidation, login);
 router.get('/me', protect, getMe);
-router.put('/updatedetails', protect, updateDetails);
+router.put('/updatedetails', protect, updateDetailsValidation, updateDetails);
 
 module.exports = router;

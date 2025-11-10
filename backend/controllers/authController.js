@@ -1,6 +1,23 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
+// Helper to create user response object
+const createUserResponse = (user, token = null) => {
+    const response = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        memberSince: user.memberSince
+    };
+
+    if (token) {
+        response.token = token;
+    }
+
+    return response;
+};
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -8,9 +25,7 @@ exports.register = async (req, res) => {
     try {
         const { name, email, phone, password } = req.body;
 
-        // Check if user exists
         const userExists = await User.findOne({ email });
-
         if (userExists) {
             return res.status(400).json({
                 success: false,
@@ -18,32 +33,18 @@ exports.register = async (req, res) => {
             });
         }
 
-        // Create user
-        const user = await User.create({
-            name,
-            email,
-            phone,
-            password
-        });
-
-        // Generate token
+        const user = await User.create({ name, email, phone, password });
         const token = generateToken(user._id);
 
         res.status(201).json({
             success: true,
-            data: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                memberSince: user.memberSince,
-                token
-            }
+            data: createUserResponse(user, token)
         });
     } catch (error) {
+        console.error('Register error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Registration failed. Please try again.'
         });
     }
 };
@@ -55,7 +56,6 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate email & password
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -63,44 +63,25 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Check for user (include password)
         const user = await User.findOne({ email }).select('+password');
-
-        if (!user) {
+        if (!user || !(await user.comparePassword(password))) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
             });
         }
 
-        // Check if password matches
-        const isMatch = await user.comparePassword(password);
-
-        if (!isMatch) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid credentials'
-            });
-        }
-
-        // Generate token
         const token = generateToken(user._id);
 
         res.json({
             success: true,
-            data: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                memberSince: user.memberSince,
-                token
-            }
+            data: createUserResponse(user, token)
         });
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Login failed. Please try again.'
         });
     }
 };
@@ -110,16 +91,17 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getMe = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.id).select('-password');
 
         res.json({
             success: true,
             data: user
         });
     } catch (error) {
+        console.error('Get profile error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve profile'
         });
     }
 };
@@ -129,25 +111,24 @@ exports.getMe = async (req, res) => {
 // @access  Private
 exports.updateDetails = async (req, res) => {
     try {
-        const fieldsToUpdate = {
-            name: req.body.name,
-            email: req.body.email,
-            phone: req.body.phone
-        };
+        const { name, email, phone } = req.body;
+        const fieldsToUpdate = { name, email, phone };
 
-        const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
-            new: true,
-            runValidators: true
-        });
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            fieldsToUpdate,
+            { new: true, runValidators: true }
+        ).select('-password');
 
         res.json({
             success: true,
             data: user
         });
     } catch (error) {
+        console.error('Update details error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Failed to update profile'
         });
     }
 };

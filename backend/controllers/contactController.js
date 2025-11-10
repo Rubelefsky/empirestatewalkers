@@ -7,12 +7,7 @@ exports.submitContact = async (req, res) => {
     try {
         const { name, email, phone, message } = req.body;
 
-        const contact = await Contact.create({
-            name,
-            email,
-            phone,
-            message
-        });
+        const contact = await Contact.create({ name, email, phone, message });
 
         res.status(201).json({
             success: true,
@@ -20,9 +15,10 @@ exports.submitContact = async (req, res) => {
             data: contact
         });
     } catch (error) {
+        console.error('Submit contact error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Failed to send message. Please try again.'
         });
     }
 };
@@ -40,9 +36,10 @@ exports.getContactMessages = async (req, res) => {
             data: messages
         });
     } catch (error) {
+        console.error('Get contact messages error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve messages'
         });
     }
 };
@@ -70,9 +67,10 @@ exports.updateContactStatus = async (req, res) => {
             data: message
         });
     } catch (error) {
+        console.error('Update contact status error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Failed to update message status'
         });
     }
 };
