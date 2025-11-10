@@ -98,11 +98,15 @@ Currently serving:
 - Upper East Side, Manhattan
 - Upper West Side, Manhattan
 - Midtown, Manhattan
+- Lower East Side, Manhattan
+- Lower West Side, Manhattan
+- Astoria, Queens
+- Long Island City, Queens
 
 ## Contact Information
 
 - **Phone**: (555) 123-4567
-- **Email**: hello@empirestatewalkers.com
+- **Email**: walk@esw.dog
 - **Hours**: Available 7am - 9pm daily
 
 ## Future Enhancements
