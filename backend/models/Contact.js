@@ -10,6 +10,7 @@ const contactSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide an email'],
         trim: true,
+        lowercase: true,
         match: [
             /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
             'Please provide a valid email'
@@ -26,7 +27,7 @@ const contactSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['new', 'read', 'responded'],
+        enum: ['new', 'in-progress', 'resolved'],
         default: 'new'
     }
 }, {
