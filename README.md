@@ -4,18 +4,20 @@ Professional dog walking and pet sitting services - Full-stack web application f
 
 ## Overview
 
-Empire State Walkers is a modern, full-stack web application for a professional dog walking and pet care service based in Manhattan. The application features a minimalist design, comprehensive backend API with MongoDB integration, JWT authentication, booking management, and a responsive user interface.
+Empire State Walkers is a modern, full-stack web application for a professional dog walking and pet care service based in Manhattan. The application features a minimalist design, production-ready security with rate limiting and comprehensive input validation, RESTful backend API with MongoDB integration, JWT authentication, advanced booking management, and a responsive user interface.
 
 ## Features
 
 ### Core Functionality
 - **Minimalist, Responsive Design**: Clean, modern UI optimized for desktop, tablet, and mobile devices
-- **User Authentication**: Secure JWT-based authentication with bcrypt password hashing
-- **Booking Management System**: Full CRUD operations for managing dog walking and pet sitting bookings
+- **Secure Authentication**: JWT-based authentication with bcrypt password hashing and rate limiting
+- **Comprehensive Input Validation**: Server-side validation on all endpoints using express-validator
+- **Advanced Booking System**: Full CRUD operations with automated pricing, ownership verification, and status tracking
 - **Customer Dashboard**: Personalized dashboard for managing bookings and account information
-- **Contact Form**: Backend-integrated contact form with message tracking
-- **RESTful API**: Comprehensive backend API with proper error handling and validation
-- **Role-Based Access Control**: User and admin roles with protected routes
+- **Contact Management**: Backend-integrated contact form with admin message tracking and status updates
+- **Production-Ready API**: RESTful backend with rate limiting, error handling, and security best practices
+- **Role-Based Access Control**: User and admin roles with middleware-protected routes
+- **Rate Limiting**: Brute-force protection with configurable request limits per endpoint
 
 ### Services Offered
 - **Daily Walks**: 30-60 minute walks ($25-35)
@@ -37,10 +39,11 @@ Empire State Walkers is a modern, full-stack web application for a professional 
 - **Express.js**: Web framework
 - **MongoDB**: NoSQL database
 - **Mongoose**: ODM for MongoDB
-- **JWT**: Token-based authentication
-- **bcryptjs**: Secure password hashing
-- **CORS**: Cross-origin resource sharing
-- **express-validator**: Input validation and sanitization
+- **JWT (jsonwebtoken)**: Token-based authentication
+- **bcryptjs**: Secure password hashing with salt rounds
+- **CORS**: Cross-origin resource sharing with configurable origins
+- **express-validator**: Comprehensive input validation and sanitization
+- **express-rate-limit**: Rate limiting middleware for brute-force protection
 
 ## Project Structure
 
@@ -48,32 +51,33 @@ Empire State Walkers is a modern, full-stack web application for a professional 
 empirestatewalkers/
 ├── frontend/
 │   ├── index.html          # Main HTML file
-│   ├── styles.css          # Custom CSS styles
-│   ├── script.js           # Basic frontend functionality
+│   ├── styles.css          # Custom CSS styles with Tailwind
 │   └── frontend-api.js     # Frontend with full API integration
 ├── backend/
 │   ├── config/
-│   │   └── database.js     # MongoDB connection
+│   │   ├── database.js     # MongoDB connection configuration
+│   │   └── services.js     # Service pricing configuration
 │   ├── controllers/
-│   │   ├── authController.js    # Authentication logic
-│   │   ├── bookingController.js # Booking management
+│   │   ├── authController.js    # Authentication logic with field filtering
+│   │   ├── bookingController.js # Booking CRUD with ownership verification
 │   │   └── contactController.js # Contact form handling
 │   ├── middleware/
-│   │   ├── auth.js         # Authentication middleware
-│   │   └── errorHandler.js # Global error handler
+│   │   ├── auth.js         # JWT authentication & role-based authorization
+│   │   ├── errorHandler.js # Global error handler with JWT/Mongoose support
+│   │   └── validators.js   # Input validation rules for all endpoints
 │   ├── models/
-│   │   ├── User.js         # User schema
-│   │   ├── Booking.js      # Booking schema
-│   │   └── Contact.js      # Contact schema
+│   │   ├── User.js         # User schema with password hashing
+│   │   ├── Booking.js      # Booking schema with pricing
+│   │   └── Contact.js      # Contact schema with status tracking
 │   ├── routes/
-│   │   ├── authRoutes.js   # Auth endpoints
-│   │   ├── bookingRoutes.js # Booking endpoints
+│   │   ├── authRoutes.js   # Auth endpoints with rate limiting
+│   │   ├── bookingRoutes.js # Booking endpoints with validation
 │   │   └── contactRoutes.js # Contact endpoints
 │   ├── utils/
 │   │   └── generateToken.js # JWT token generator
 │   ├── .env.example        # Environment variables template
-│   ├── package.json        # Dependencies
-│   ├── server.js           # Entry point
+│   ├── package.json        # Backend dependencies
+│   ├── server.js           # Express server with middleware setup
 │   └── README.md           # Backend documentation
 └── README.md               # This file
 ```
@@ -110,11 +114,19 @@ cp .env.example .env
 
 Update the `.env` file with your configuration:
 ```env
+# Server Configuration
 PORT=5000
+NODE_ENV=development
+
+# Database
 MONGODB_URI=mongodb://localhost:27017/empirestatewalkers
+
+# JWT Authentication
 JWT_SECRET=your_strong_secret_key_here
 JWT_EXPIRE=30d
-NODE_ENV=development
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:8000
 ```
 
 #### 3. Database Setup
@@ -152,10 +164,7 @@ The server will run on `http://localhost:5000`
 
 #### 5. Frontend Setup
 
-Open a new terminal and navigate back to the project root:
-```bash
-cd ..
-```
+The frontend is already configured to use the full API integration via `frontend-api.js`.
 
 Serve the frontend using a local development server:
 ```bash
@@ -163,7 +172,7 @@ Serve the frontend using a local development server:
 python -m http.server 8000
 
 # Using Node.js with npx
-npx http-server
+npx http-server -p 8000
 
 # Using PHP
 php -S localhost:8000
@@ -171,10 +180,7 @@ php -S localhost:8000
 
 Navigate to `http://localhost:8000` in your browser.
 
-**Note**: To use the full API integration, replace `script.js` with `frontend-api.js` in `index.html`, or update the script source:
-```html
-<script src="frontend-api.js"></script>
-```
+**Important**: Ensure the `CORS_ORIGIN` in your backend `.env` file matches your frontend URL (default: `http://localhost:8000`).
 
 ## API Endpoints
 
@@ -265,18 +271,79 @@ curl -X POST http://localhost:5000/api/bookings \
 
 ### Contact
 - name, email, phone, message
-- status (new/read/responded)
+- status (new/in-progress/resolved)
 - createdAt
+
+## Input Validation Requirements
+
+All API endpoints enforce strict validation rules to ensure data integrity and security:
+
+### User Registration
+- **Name**: Required, 2-50 characters
+- **Email**: Required, valid email format, normalized (lowercase)
+- **Phone**: Required, valid phone format
+- **Password**: Required, minimum 8 characters, must contain:
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+
+### Booking Creation/Update
+- **Dog Name**: Required, 2-50 characters
+- **Dog Breed**: Required, 2-50 characters
+- **Service**: Required, must be one of:
+  - "Daily Walk (30 min)" - $25
+  - "Daily Walk (60 min)" - $35
+  - "Pet Sitting" - $40
+  - "Emergency Visit" - $50
+  - "Other" - Custom pricing
+- **Date**: Required, must be today or future date (format: YYYY-MM-DD)
+- **Time**: Required, valid time format (HH:MM AM/PM)
+- **Duration**: Optional, 2-50 characters
+- **Special Instructions**: Optional, maximum 500 characters
+- **Status**: Optional for updates, one of: pending, confirmed, completed, cancelled
+
+### Contact Form
+- **Name**: Required, 2-50 characters
+- **Email**: Required, valid email format
+- **Phone**: Optional, valid phone format if provided
+- **Message**: Required, 10-1000 characters
+
+All validation errors return a 400 status code with detailed error messages indicating which fields failed validation and why.
 
 ## Security Features
 
+### Authentication & Authorization
 - **Password Security**: Bcrypt hashing with 10 salt rounds
-- **JWT Authentication**: Token-based auth with configurable expiration
-- **Protected Routes**: Middleware-based route protection
-- **Role-Based Access**: User and admin role separation
-- **Input Validation**: Express-validator for request validation
-- **CORS Configuration**: Controlled cross-origin access
-- **Error Handling**: Centralized error handling middleware
+- **JWT Authentication**: Token-based auth with configurable expiration (default: 30 days)
+- **Protected Routes**: Middleware-based route protection with JWT verification
+- **Role-Based Access Control**: User and admin role separation with authorization middleware
+
+### Input Protection
+- **Comprehensive Input Validation**: Express-validator on all endpoints with detailed rules:
+  - Email validation and normalization
+  - Password strength requirements (8+ chars, uppercase, lowercase, number)
+  - Phone number format validation
+  - Date validation (prevents past date bookings)
+  - Message length limits (10-1000 characters)
+  - Service type enum validation
+
+### Rate Limiting
+- **Brute-Force Protection**: Express-rate-limit middleware
+  - General API: 100 requests per 15 minutes per IP
+  - Auth endpoints: 5 login attempts per 15 minutes per IP
+  - Skips counting successful authentication requests
+
+### Data Protection
+- **Field Filtering**: Sensitive data (passwords) excluded from API responses
+- **Error Handling**: Centralized error handler with production/development modes
+  - No stack traces in production
+  - Specific handling for JWT, Mongoose, and validation errors
+  - Generic error messages to prevent information leakage
+
+### Network Security
+- **CORS Configuration**: Configurable origin via environment variable
+- **404 Handler**: Catches undefined routes
+- **Uncaught Exception Handler**: Graceful error handling for unexpected errors
 
 ## Service Area
 
@@ -309,12 +376,14 @@ Recommended platforms:
 **Production Environment Variables:**
 ```env
 NODE_ENV=production
-MONGODB_URI=your_production_mongodb_uri
-JWT_SECRET=strong_production_secret
 PORT=5000
+MONGODB_URI=your_production_mongodb_uri
+JWT_SECRET=strong_production_secret_key
+JWT_EXPIRE=30d
+CORS_ORIGIN=https://your-production-frontend-domain.com
 ```
 
-Don't forget to update CORS origin in `backend/server.js` to your production frontend domain.
+**Important**: Always update `CORS_ORIGIN` to match your production frontend URL for security.
 
 ### Frontend Deployment
 
@@ -323,6 +392,39 @@ Deploy to:
 - **Vercel**: Optimized for frontend
 - **GitHub Pages**: Free hosting
 - **AWS S3 + CloudFront**: Enterprise CDN solution
+
+## Recent Updates
+
+### Latest Refactor: Security & Code Quality Improvements
+
+Recent major updates focused on production-readiness, security hardening, and code maintainability:
+
+**Security Enhancements:**
+- Added rate limiting middleware (express-rate-limit) to prevent brute-force attacks
+- Implemented comprehensive input validation on all endpoints using express-validator
+- Enhanced error handler with specific JWT and Mongoose error handling
+- Added field filtering to prevent password leakage in API responses
+- Configured CORS via environment variable for better security control
+- Added 404 handler and uncaught exception handler
+
+**Code Quality Improvements:**
+- Extracted service pricing to configuration file (`backend/config/services.js`)
+- Created validation middleware module (`backend/middleware/validators.js`)
+- Simplified controller logic with helper functions
+- Fixed User model pre-hook bug (missing return statement)
+- Removed deprecated Mongoose connection options
+- Updated Contact model status enum (new/in-progress/resolved)
+- Improved code consistency and reduced duplication
+
+**Frontend Improvements:**
+- Removed insecure `script.js` file that stored passwords in plain text
+- Updated `index.html` to use only secure `frontend-api.js`
+
+**Developer Experience:**
+- Updated `.env.example` with all configuration options
+- Enhanced error messages for better debugging
+- Consistent code style across all files
+- Better structured validation error responses
 
 ## Future Enhancements
 
@@ -361,14 +463,16 @@ Copyright © 2025 Empire State Walkers. All rights reserved.
 ### Frontend can't connect to API
 - Ensure backend server is running on port 5000
 - Check API_URL in `frontend-api.js` matches backend URL
-- Verify CORS settings in `backend/server.js`
+- Verify `CORS_ORIGIN` in backend `.env` matches your frontend URL
 - Check browser console for detailed error messages
+- Ensure CORS middleware is properly configured
 
 ### Authentication issues
 - Clear browser localStorage and cookies
 - Verify JWT_SECRET is set in backend `.env`
 - Check token hasn't expired (default: 30 days)
-- Ensure password meets minimum requirements
+- Ensure password meets requirements (8+ chars, uppercase, lowercase, number)
+- If getting "Too many requests" error, wait 15 minutes (rate limit protection)
 
 ## Support
 
