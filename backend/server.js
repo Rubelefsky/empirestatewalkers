@@ -18,15 +18,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
-const corsOrigin = process.env.CORS_ORIGIN ||
-    (process.env.NODE_ENV === 'production'
-        ? 'https://yourdomain.com'
-        : 'http://localhost:3000');
+const corsOptions = process.env.NODE_ENV === 'production'
+    ? {
+        origin: process.env.CORS_ORIGIN || 'https://yourdomain.com',
+        credentials: true
+    }
+    : {
+        origin: true, // Allow all origins in development
+        credentials: true
+    };
 
-app.use(cors({
-    origin: corsOrigin,
-    credentials: true
-}));
+app.use(cors(corsOptions));
 
 // Rate limiting - prevent brute force attacks
 const limiter = rateLimit({

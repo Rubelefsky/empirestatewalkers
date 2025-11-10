@@ -1,7 +1,7 @@
 // Empire State Walkers - Frontend with API Integration
 // Replace script.js with this file or rename to script.js when backend is running
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5001/api';
 
 class EmpireStateWalkers {
     constructor() {
@@ -277,6 +277,13 @@ class EmpireStateWalkers {
             return;
         }
 
+        // Validate password strength
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            alert('Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, and one number.');
+            return;
+        }
+
         try {
             const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
@@ -299,11 +306,16 @@ class EmpireStateWalkers {
                 this.updateUIBasedOnAuth();
                 document.getElementById('register-form').reset();
             } else {
-                alert('Registration failed: ' + data.message);
+                // Display detailed error messages
+                let errorMessage = data.message;
+                if (data.errors && data.errors.length > 0) {
+                    errorMessage = data.errors.map(err => `${err.field}: ${err.message}`).join('\n');
+                }
+                alert('Registration failed:\n' + errorMessage);
             }
         } catch (error) {
             console.error('Registration error:', error);
-            alert('Registration error. Please try again.');
+            alert('Registration error. Please make sure the backend server is running and try again.');
         }
     }
 

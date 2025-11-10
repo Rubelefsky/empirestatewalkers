@@ -6,6 +6,36 @@ Professional dog walking and pet sitting services - Full-stack web application f
 
 Empire State Walkers is a modern, full-stack web application for a professional dog walking and pet care service based in Manhattan. The application features a minimalist design, production-ready security with rate limiting and comprehensive input validation, RESTful backend API with MongoDB integration, JWT authentication, advanced booking management, and a responsive user interface.
 
+## Quick Start
+
+Get the application running in 5 minutes:
+
+```bash
+# 1. Ensure MongoDB is running
+brew services start mongodb-community  # macOS
+# or: sudo systemctl start mongod      # Linux
+
+# 2. Clone and setup backend
+cd empirestatewalkers/backend
+npm install
+cp .env.example .env
+# Edit .env if needed (default settings work for local development)
+
+# 3. Start backend server (port 5001)
+npm run dev
+
+# 4. In a new terminal, start frontend server (port 8080)
+cd ..
+python3 -m http.server 8080
+
+# 5. Open browser to http://localhost:8080
+```
+
+**Test Registration:**
+- Click "Login" → "Register"
+- Password must be 8+ characters with uppercase, lowercase, and number
+- Example: `Password123`
+
 ## Features
 
 ### Core Functionality
@@ -115,7 +145,7 @@ cp .env.example .env
 Update the `.env` file with your configuration:
 ```env
 # Server Configuration
-PORT=5000
+PORT=5001
 NODE_ENV=development
 
 # Database
@@ -126,8 +156,10 @@ JWT_SECRET=your_strong_secret_key_here
 JWT_EXPIRE=30d
 
 # CORS Configuration
-CORS_ORIGIN=http://localhost:8000
+CORS_ORIGIN=http://localhost:8080
 ```
+
+**Note**: Port 5001 is used instead of 5000 because macOS AirPlay Receiver uses port 5000 by default.
 
 #### 3. Database Setup
 
@@ -160,7 +192,7 @@ Production mode:
 npm start
 ```
 
-The server will run on `http://localhost:5000`
+The server will run on `http://localhost:5001`
 
 #### 5. Frontend Setup
 
@@ -169,18 +201,18 @@ The frontend is already configured to use the full API integration via `frontend
 Serve the frontend using a local development server:
 ```bash
 # Using Python 3
-python -m http.server 8000
+python3 -m http.server 8080
 
 # Using Node.js with npx
-npx http-server -p 8000
+npx http-server -p 8080
 
 # Using PHP
-php -S localhost:8000
+php -S localhost:8080
 ```
 
-Navigate to `http://localhost:8000` in your browser.
+Navigate to `http://localhost:8080` in your browser.
 
-**Important**: Ensure the `CORS_ORIGIN` in your backend `.env` file matches your frontend URL (default: `http://localhost:8000`).
+**Important**: Ensure the `CORS_ORIGIN` in your backend `.env` file matches your frontend URL (default: `http://localhost:8080`). In development mode, CORS is configured to allow all origins for easier testing.
 
 ## API Endpoints
 
@@ -226,25 +258,25 @@ Use tools like Postman, Insomnia, or Thunder Client:
 
 ```bash
 # Register a new user
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST http://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
     "email": "john@example.com",
     "phone": "555-123-4567",
-    "password": "password123"
+    "password": "Password123"
   }'
 
 # Login
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
-    "password": "password123"
+    "password": "Password123"
   }'
 
 # Create booking (requires auth token)
-curl -X POST http://localhost:5000/api/bookings \
+curl -X POST http://localhost:5001/api/bookings \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
@@ -273,6 +305,116 @@ curl -X POST http://localhost:5000/api/bookings \
 - name, email, phone, message
 - status (new/in-progress/resolved)
 - createdAt
+
+## Working with MongoDB
+
+### Accessing MongoDB Shell
+
+```bash
+# Connect to your database
+mongosh mongodb://localhost:27017/empirestatewalkers
+```
+
+### Common Database Operations
+
+**View Collections:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.getCollectionNames()"
+```
+
+**View All Users:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.find().pretty()"
+```
+
+**Count Users:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.countDocuments()"
+```
+
+**Find User by Email:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.findOne({email: 'user@example.com'})"
+```
+
+**Make User an Admin:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.updateOne({email: 'user@example.com'}, {\$set: {role: 'admin'}})"
+```
+
+**Delete a User:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.deleteOne({email: 'user@example.com'})"
+```
+
+**View Database Statistics:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "
+  print('Total Users: ' + db.users.countDocuments());
+  print('Total Bookings: ' + db.bookings.countDocuments());
+  print('Total Contacts: ' + db.contacts.countDocuments());
+"
+```
+
+**Export Collection to JSON:**
+```bash
+mongoexport --db=empirestatewalkers --collection=users --out=users_backup.json --pretty
+```
+
+**Import Collection from JSON:**
+```bash
+mongoimport --db=empirestatewalkers --collection=users --file=users_backup.json
+```
+
+**Backup Entire Database:**
+```bash
+mongodump --db=empirestatewalkers --out=/path/to/backup
+```
+
+**Restore Database:**
+```bash
+mongorestore --db=empirestatewalkers /path/to/backup/empirestatewalkers
+```
+
+### Interactive MongoDB Shell Commands
+
+Once connected with `mongosh mongodb://localhost:27017/empirestatewalkers`:
+
+```javascript
+// View all users
+db.users.find().pretty()
+
+// Find users by criteria
+db.users.find({role: "admin"})
+db.users.find({name: /Brandon/i})  // Case-insensitive search
+
+// Sort users by creation date
+db.users.find().sort({createdAt: -1})
+
+// Select specific fields only
+db.users.find({}, {name: 1, email: 1, _id: 0})
+
+// View all bookings
+db.bookings.find().pretty()
+
+// Find bookings for a specific user
+db.bookings.find({user: ObjectId("user_id_here")})
+
+// Find pending bookings
+db.bookings.find({status: "pending"})
+
+// Update booking status
+db.bookings.updateOne(
+  {_id: ObjectId("booking_id_here")},
+  {$set: {status: "confirmed"}}
+)
+
+// View all contact submissions
+db.contacts.find().pretty()
+
+// Exit shell
+exit
+```
 
 ## Input Validation Requirements
 
@@ -376,7 +518,7 @@ Recommended platforms:
 **Production Environment Variables:**
 ```env
 NODE_ENV=production
-PORT=5000
+PORT=5001
 MONGODB_URI=your_production_mongodb_uri
 JWT_SECRET=strong_production_secret_key
 JWT_EXPIRE=30d
@@ -395,9 +537,38 @@ Deploy to:
 
 ## Recent Updates
 
-### Latest Refactor: Security & Code Quality Improvements
+### November 2025: Registration Bug Fix & Configuration Updates
 
-Recent major updates focused on production-readiness, security hardening, and code maintainability:
+**Bug Fixes:**
+- Fixed registration failure due to password validation mismatch:
+  - Frontend form required minimum 6 characters
+  - Backend validator required minimum 8 characters with complexity rules
+  - User model required minimum 6 characters
+  - **Resolution**: Standardized all validation to 8 characters minimum with uppercase, lowercase, and number requirements
+- Added HTML5 pattern validation on registration form with user-friendly error messages
+- Enhanced frontend error handling to display detailed validation errors from backend
+
+**Configuration Changes:**
+- Changed default backend port from 5000 to 5001 to avoid conflicts with macOS AirPlay Receiver
+- Updated frontend API URL to `http://localhost:5001/api`
+- Updated CORS configuration to allow all origins in development mode for easier testing
+- Updated all documentation and examples to reflect new port configuration
+
+**Improvements:**
+- Added client-side password strength validation before API submission
+- Improved error messages to show which fields failed validation and why
+- Added MongoDB query examples and database management guide
+- Enhanced troubleshooting section with macOS-specific issues
+
+**Testing:**
+- Verified registration endpoint with valid credentials
+- Tested password validation rejection for weak passwords
+- Confirmed user data is properly stored in MongoDB with bcrypt-hashed passwords
+- Validated CORS functionality across different origins
+
+### Previous Refactor: Security & Code Quality Improvements
+
+Major updates focused on production-readiness, security hardening, and code maintainability:
 
 **Security Enhancements:**
 - Added rate limiting middleware (express-rate-limit) to prevent brute-force attacks
@@ -455,17 +626,20 @@ Copyright © 2025 Empire State Walkers. All rights reserved.
 ## Troubleshooting
 
 ### Backend won't start
-- Ensure MongoDB is running
+- Ensure MongoDB is running: `brew services start mongodb-community` (macOS)
 - Check `.env` file exists and has correct values
 - Verify all dependencies are installed: `npm install`
-- Check port 5000 is not already in use
+- Check port 5001 is not already in use
+- **macOS Issue**: If port 5000 is in use, it's likely AirPlay Receiver. Either:
+  - Use port 5001 (recommended, already configured)
+  - Disable AirPlay Receiver in System Settings > General > AirDrop & Handoff
 
 ### Frontend can't connect to API
-- Ensure backend server is running on port 5000
-- Check API_URL in `frontend-api.js` matches backend URL
+- Ensure backend server is running on port 5001
+- Check API_URL in `frontend-api.js` matches backend URL (`http://localhost:5001/api`)
 - Verify `CORS_ORIGIN` in backend `.env` matches your frontend URL
 - Check browser console for detailed error messages
-- Ensure CORS middleware is properly configured
+- In development, CORS allows all origins for easier testing
 
 ### Authentication issues
 - Clear browser localStorage and cookies
