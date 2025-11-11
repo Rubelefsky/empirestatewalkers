@@ -1,0 +1,336 @@
+/* Admin Dashboard Specific Styles */
+
+/* Nav adjustments for admin */
+.nav-text {
+    color: var(--gray);
+    font-size: 14px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stat-card {
+    border: 1px solid var(--black);
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--black);
+    margin-bottom: var(--spacing-lg);
+}
+
+.tab-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    opacity: 0.7;
+}
+
+.tab-btn.active {
+    border-bottom: 2px solid var(--black);
+    font-weight: 700;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Tab Header */
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--black);
+}
+
+.tab-header h3 {
+    font-size: 18px;
+    margin: 0;
+}
+
+/* Filters */
+.filters {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.filter-select {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--black);
+    background-color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    background-color: var(--light-gray);
+}
+
+/* Admin Lists */
+.admin-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.admin-booking-item {
+    border: 1px solid var(--black);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.admin-booking-item:hover {
+    background-color: var(--light-gray);
+}
+
+.admin-booking-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.admin-booking-title {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.admin-booking-user {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-booking-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.admin-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.admin-info-label {
+    font-size: 11px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-info-value {
+    font-size: 14px;
+}
+
+.admin-booking-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Message Item */
+.admin-message-item {
+    border: 1px solid var(--black);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.admin-message-item.new {
+    background-color: #fff9c4;
+}
+
+.admin-message-item:hover {
+    background-color: var(--light-gray);
+}
+
+.admin-message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-sm);
+}
+
+.admin-message-title {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.message-status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border: 1px solid var(--black);
+    text-transform: capitalize;
+}
+
+.message-status.new {
+    background-color: #fff9c4;
+}
+
+.message-status.read {
+    background-color: var(--light-gray);
+}
+
+.message-status.resolved {
+    background-color: #c8e6c9;
+}
+
+.admin-message-meta {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: var(--spacing-sm);
+}
+
+.admin-message-content {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: var(--light-gray);
+}
+
+.admin-message-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+/* Details Content */
+.details-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.details-section {
+    padding: var(--spacing-md);
+    border: 1px solid var(--black);
+}
+
+.details-section h4 {
+    font-size: 14px;
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.details-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.details-label {
+    font-size: 11px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.details-value {
+    font-size: 14px;
+}
+
+.details-full {
+    grid-column: 1 / -1;
+}
+
+.info-display {
+    padding: var(--spacing-sm);
+    background-color: var(--light-gray);
+    font-size: 14px;
+    text-transform: capitalize;
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tab-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .admin-booking-info {
+        grid-template-columns: 1fr;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab-btn {
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .tab-btn.active {
+        border-left: 2px solid var(--black);
+        border-bottom: 1px solid #e0e0e0;
+    }
+}

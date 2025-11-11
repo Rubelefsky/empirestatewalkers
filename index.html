@@ -184,11 +184,13 @@
                 </div>
 
                 <div class="dashboard-card">
-                    <h3>Bookings</h3>
+                    <div class="card-header">
+                        <h3>Bookings</h3>
+                        <button id="create-booking-btn" class="btn-minimal btn-small">+ New Booking</button>
+                    </div>
                     <div id="bookings-list" class="bookings-list">
                         <p class="empty-state">No bookings yet</p>
                     </div>
-                    <a href="#contact" class="btn-minimal">Book a Walk</a>
                 </div>
             </div>
         </div>
@@ -251,6 +253,62 @@
                 Already have an account?
                 <button id="show-login-modal" class="link-btn">Login</button>
             </p>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <button id="close-booking-modal" class="modal-close">×</button>
+            <h2 id="booking-modal-title">New Booking</h2>
+            <form id="booking-form">
+                <input type="hidden" id="booking-id">
+                <div class="form-group">
+                    <label for="booking-dog-name">Dog's Name</label>
+                    <input type="text" id="booking-dog-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="booking-dog-breed">Breed</label>
+                    <input type="text" id="booking-dog-breed" required>
+                </div>
+                <div class="form-group">
+                    <label for="booking-dog-age">Age</label>
+                    <input type="number" id="booking-dog-age" min="0" max="30" required>
+                </div>
+                <div class="form-group">
+                    <label for="booking-service">Service</label>
+                    <select id="booking-service" required>
+                        <option value="">Select a service</option>
+                        <option value="Daily Walk (30 min)">Daily Walk (30 min) - $25</option>
+                        <option value="Daily Walk (60 min)">Daily Walk (60 min) - $35</option>
+                        <option value="Pet Sitting">Pet Sitting - $40</option>
+                        <option value="Emergency Visit">Emergency Visit - $50</option>
+                        <option value="Other">Other - Contact for pricing</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="booking-date">Date</label>
+                        <input type="date" id="booking-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-time">Time</label>
+                        <input type="time" id="booking-time" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="booking-duration">Duration (minutes)</label>
+                    <input type="number" id="booking-duration" min="15" max="480" value="30" required>
+                </div>
+                <div class="form-group">
+                    <label for="booking-notes">Special Notes</label>
+                    <textarea id="booking-notes" rows="3" placeholder="Any special instructions or requirements..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-minimal">Save Booking</button>
+                    <button type="button" id="cancel-booking-btn" class="btn-minimal btn-secondary">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 

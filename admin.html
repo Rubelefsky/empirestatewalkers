@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Empire State Walkers</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">ESW Admin</a>
+            <div class="nav-links">
+                <span id="admin-user-name" class="nav-text"></span>
+                <button id="logout-btn" class="nav-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <section id="admin-dashboard" class="section">
+        <div class="container">
+            <h2 class="section-title">Admin Dashboard</h2>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Bookings</div>
+                    <div class="stat-value" id="stat-total-bookings">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value" id="stat-pending">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Confirmed</div>
+                    <div class="stat-value" id="stat-confirmed">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value" id="stat-completed">0</div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="bookings">Bookings</button>
+                <button class="tab-btn" data-tab="messages">Contact Messages</button>
+            </div>
+
+            <!-- Bookings Tab -->
+            <div id="bookings-tab" class="tab-content active">
+                <div class="tab-header">
+                    <h3>All Bookings</h3>
+                    <div class="filters">
+                        <select id="status-filter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="bookings-list" class="admin-list">
+                    <p class="empty-state">No bookings found</p>
+                </div>
+            </div>
+
+            <!-- Messages Tab -->
+            <div id="messages-tab" class="tab-content">
+                <div class="tab-header">
+                    <h3>Contact Messages</h3>
+                    <div class="filters">
+                        <select id="message-filter" class="filter-select">
+                            <option value="">All Messages</option>
+                            <option value="new">New</option>
+                            <option value="read">Read</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="messages-list" class="admin-list">
+                    <p class="empty-state">No messages found</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Update Booking Status Modal -->
+    <div id="status-modal" class="modal hidden">
+        <div class="modal-content">
+            <button id="close-status-modal" class="modal-close">×</button>
+            <h2>Update Booking Status</h2>
+            <form id="status-form">
+                <input type="hidden" id="status-booking-id">
+                <div class="form-group">
+                    <label>Current Status</label>
+                    <div id="current-status" class="info-display"></div>
+                </div>
+                <div class="form-group">
+                    <label for="new-status">New Status</label>
+                    <select id="new-status" required>
+                        <option value="">Select status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-minimal">Update Status</button>
+                    <button type="button" id="cancel-status-btn" class="btn-minimal btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Booking Details Modal -->
+    <div id="details-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <button id="close-details-modal" class="modal-close">×</button>
+            <h2>Booking Details</h2>
+            <div id="booking-details-content" class="details-content"></div>
+            <div class="form-actions">
+                <button id="close-details-btn" class="btn-minimal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span>© 2025 Empire State Walkers - Admin Panel</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="admin.js"></script>
+</body>
+</html>
