@@ -1,151 +1,137 @@
-# Empire State Walkers
+# 🐕 Empire State Walkers
 
-Professional dog walking and pet sitting services - Full-stack web application for Manhattan, NYC.
+<div align="center">
 
-## Overview
+**Professional dog walking and pet care services for Manhattan, NYC**
 
-Empire State Walkers is a modern, full-stack web application for a professional dog walking and pet care service based in Manhattan. The application features a minimalist design, production-ready security with rate limiting and comprehensive input validation, RESTful backend API with MongoDB integration, JWT authentication, advanced booking management, and a responsive user interface.
+[![Node.js](https://img.shields.io/badge/Node.js-v14+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-v4.4+-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Express.js](https://img.shields.io/badge/Express.js-v4.18-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
-## Quick Start
+[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [API](#-api-endpoints) • [Security](#-security)
 
-Get the application running in 5 minutes:
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [Technology Stack](#-technology-stack)
+- [Installation](#-installation)
+- [API Endpoints](#-api-endpoints)
+- [Database](#-database)
+- [Security](#-security)
+- [Deployment](#-deployment)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+
+## 🎯 Overview
+
+Empire State Walkers is a modern, full-stack web application for a professional dog walking and pet care service. Built with security-first principles, the application features JWT authentication, comprehensive input validation, rate limiting, and a responsive UI optimized for all devices.
+
+**Service Area:** Manhattan (Upper East/West Side, Midtown, Lower East/West Side) and Queens (Astoria, Long Island City)
+
+## ✨ Features
+
+### Core Functionality
+- 🎨 **Minimalist Design** - Clean, responsive UI with Tailwind CSS
+- 🔐 **Secure Authentication** - JWT-based auth with bcrypt password hashing
+- ✅ **Input Validation** - Comprehensive server-side validation with express-validator
+- 📅 **Booking System** - Full CRUD operations with automated pricing and status tracking
+- 👤 **Customer Dashboard** - Personalized booking and account management
+- 📧 **Contact Management** - Integrated contact form with admin tracking
+- 🛡️ **Rate Limiting** - Brute-force protection on all endpoints
+- 👑 **Role-Based Access** - User and admin roles with protected routes
+
+### Services Offered
+| Service | Duration | Price |
+|---------|----------|-------|
+| Daily Walk | 30 minutes | $25 |
+| Daily Walk | 60 minutes | $35 |
+| Pet Sitting | Per visit | $40 |
+| Emergency Visit | Same-day | $50 |
+| Additional Services | - | Custom pricing |
+
+*Additional services include grooming, training, transportation, and photo sessions*
+
+## 🚀 Quick Start
+
+Get up and running in 5 minutes:
 
 ```bash
 # 1. Ensure MongoDB is running
 brew services start mongodb-community  # macOS
 # or: sudo systemctl start mongod      # Linux
 
-# 2. Clone and setup backend
-cd empirestatewalkers/backend
+# 2. Setup backend
+cd backend
 npm install
 cp .env.example .env
-# Edit .env if needed (default settings work for local development)
+# Edit .env if needed (defaults work locally)
 
-# 3. Start backend server (port 5001)
+# 3. Start backend (port 5001)
 npm run dev
 
-# 4. In a new terminal, start frontend server (port 8080)
+# 4. In a new terminal, start frontend (port 8080)
 cd ..
 python3 -m http.server 8080
 
-# 5. Open browser to http://localhost:8080
+# 5. Open http://localhost:8080
 ```
 
-**Test Registration:**
-- Click "Login" → "Register"
-- Password must be 8+ characters with uppercase, lowercase, and number
-- Example: `Password123`
+**Test Login:** Register with password format: `Password123` (8+ chars, uppercase, lowercase, number)
 
-## Features
-
-### Core Functionality
-- **Minimalist, Responsive Design**: Clean, modern UI optimized for desktop, tablet, and mobile devices
-- **Secure Authentication**: JWT-based authentication with bcrypt password hashing and rate limiting
-- **Comprehensive Input Validation**: Server-side validation on all endpoints using express-validator
-- **Advanced Booking System**: Full CRUD operations with automated pricing, ownership verification, and status tracking
-- **Customer Dashboard**: Personalized dashboard for managing bookings and account information
-- **Contact Management**: Backend-integrated contact form with admin message tracking and status updates
-- **Production-Ready API**: RESTful backend with rate limiting, error handling, and security best practices
-- **Role-Based Access Control**: User and admin roles with middleware-protected routes
-- **Rate Limiting**: Brute-force protection with configurable request limits per endpoint
-
-### Services Offered
-- **Daily Walks**: 30-60 minute walks ($25-35)
-- **Pet Sitting**: In-home care and companionship ($40/visit)
-- **Emergency Visits**: Same-day availability ($50/visit)
-- **Additional Services**: Basic grooming, training, transportation, and photo sessions
-
-## Technology Stack
+## 🛠 Technology Stack
 
 ### Frontend
-- **HTML5**: Semantic markup structure
-- **CSS3**: Custom styles with Tailwind CSS framework
-- **JavaScript**: Vanilla JS with API integration
-- **Tailwind CSS**: Utility-first CSS framework via CDN
-- **Font Awesome**: Icon library for UI elements
+- **HTML5** - Semantic markup
+- **CSS3** - Custom styles with Tailwind CSS
+- **JavaScript** - Vanilla JS with fetch API
+- **Tailwind CSS** - Utility-first CSS framework (CDN)
+- **Font Awesome** - Icon library
 
 ### Backend
-- **Node.js**: Runtime environment
-- **Express.js**: Web framework
-- **MongoDB**: NoSQL database
-- **Mongoose**: ODM for MongoDB
-- **JWT (jsonwebtoken)**: Token-based authentication
-- **bcryptjs**: Secure password hashing with salt rounds
-- **CORS**: Cross-origin resource sharing with configurable origins
-- **express-validator**: Comprehensive input validation and sanitization
-- **express-rate-limit**: Rate limiting middleware for brute-force protection
+- **Node.js** - Runtime environment
+- **Express.js** - Web application framework
+- **MongoDB** - NoSQL database
+- **Mongoose** - MongoDB ODM
+- **JWT** - Token-based authentication
+- **bcryptjs** - Password hashing (10 salt rounds)
+- **express-validator** - Input validation and sanitization
+- **express-rate-limit** - Rate limiting middleware
+- **helmet** - Security headers
+- **winston** - Logging
+- **morgan** - HTTP request logger
 
-## Project Structure
-
-```
-empirestatewalkers/
-├── frontend/
-│   ├── index.html          # Main HTML file
-│   ├── styles.css          # Custom CSS styles with Tailwind
-│   └── frontend-api.js     # Frontend with full API integration
-├── backend/
-│   ├── config/
-│   │   ├── database.js     # MongoDB connection configuration
-│   │   └── services.js     # Service pricing configuration
-│   ├── controllers/
-│   │   ├── authController.js    # Authentication logic with field filtering
-│   │   ├── bookingController.js # Booking CRUD with ownership verification
-│   │   └── contactController.js # Contact form handling
-│   ├── middleware/
-│   │   ├── auth.js         # JWT authentication & role-based authorization
-│   │   ├── errorHandler.js # Global error handler with JWT/Mongoose support
-│   │   └── validators.js   # Input validation rules for all endpoints
-│   ├── models/
-│   │   ├── User.js         # User schema with password hashing
-│   │   ├── Booking.js      # Booking schema with pricing
-│   │   └── Contact.js      # Contact schema with status tracking
-│   ├── routes/
-│   │   ├── authRoutes.js   # Auth endpoints with rate limiting
-│   │   ├── bookingRoutes.js # Booking endpoints with validation
-│   │   └── contactRoutes.js # Contact endpoints
-│   ├── utils/
-│   │   └── generateToken.js # JWT token generator
-│   ├── .env.example        # Environment variables template
-│   ├── package.json        # Backend dependencies
-│   ├── server.js           # Express server with middleware setup
-│   └── README.md           # Backend documentation
-└── README.md               # This file
-```
-
-## Getting Started
+## 📦 Installation
 
 ### Prerequisites
-
-- **Node.js** (v14 or higher)
-- **MongoDB** (local installation or MongoDB Atlas account)
-- **npm** or **yarn** package manager
+- Node.js v14 or higher
+- MongoDB (local or MongoDB Atlas)
+- npm or yarn
 - Modern web browser
 
-### Installation
-
-#### 1. Clone the repository
+### Step 1: Clone Repository
 ```bash
 git clone https://github.com/Rubelefsky/empirestatewalkers.git
 cd empirestatewalkers
 ```
 
-#### 2. Backend Setup
-
-Navigate to the backend directory and install dependencies:
+### Step 2: Backend Setup
 ```bash
 cd backend
 npm install
-```
-
-Create a `.env` file from the example:
-```bash
 cp .env.example .env
 ```
 
-Update the `.env` file with your configuration:
+Edit `.env` with your configuration:
 ```env
 # Server Configuration
-PORT=5001
+PORT=5001                           # Port 5001 (5000 conflicts with macOS AirPlay)
 NODE_ENV=development
 
 # Database
@@ -159,9 +145,7 @@ JWT_EXPIRE=30d
 CORS_ORIGIN=http://localhost:8080
 ```
 
-**Note**: Port 5001 is used instead of 5000 because macOS AirPlay Receiver uses port 5000 by default.
-
-#### 3. Database Setup
+### Step 3: Database Setup
 
 **Option A: Local MongoDB**
 ```bash
@@ -177,343 +161,183 @@ net start MongoDB
 
 **Option B: MongoDB Atlas (Cloud)**
 1. Create account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a cluster and get connection string
-3. Update `MONGODB_URI` in `.env` with your Atlas connection string
+2. Create cluster and get connection string
+3. Update `MONGODB_URI` in `.env`
 
-#### 4. Start the Backend Server
-
-Development mode (with auto-reload):
+### Step 4: Start Backend
 ```bash
+# Development mode (with auto-reload)
 npm run dev
-```
 
-Production mode:
-```bash
+# Production mode
 npm start
 ```
 
-The server will run on `http://localhost:5001`
+Server runs on `http://localhost:5001`
 
-#### 5. Frontend Setup
-
-The frontend is already configured to use the full API integration via `frontend-api.js`.
-
-Serve the frontend using a local development server:
+### Step 5: Frontend Setup
 ```bash
-# Using Python 3
+# From project root
 python3 -m http.server 8080
-
-# Using Node.js with npx
-npx http-server -p 8080
-
-# Using PHP
-php -S localhost:8080
+# or: npx http-server -p 8080
+# or: php -S localhost:8080
 ```
 
-Navigate to `http://localhost:8080` in your browser.
+Navigate to `http://localhost:8080`
 
-**Important**: Ensure the `CORS_ORIGIN` in your backend `.env` file matches your frontend URL (default: `http://localhost:8080`). In development mode, CORS is configured to allow all origins for easier testing.
-
-## API Endpoints
+## 📡 API Endpoints
 
 ### Authentication (`/api/auth`)
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (protected)
-- `PUT /api/auth/updatedetails` - Update user details (protected)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | No | Register new user |
+| POST | `/api/auth/login` | No | Login user |
+| GET | `/api/auth/me` | Yes | Get current user |
+| PUT | `/api/auth/updatedetails` | Yes | Update user details |
 
 ### Bookings (`/api/bookings`)
-- `GET /api/bookings` - Get user's bookings (protected)
-- `GET /api/bookings/:id` - Get single booking (protected)
-- `POST /api/bookings` - Create new booking (protected)
-- `PUT /api/bookings/:id` - Update booking (protected)
-- `DELETE /api/bookings/:id` - Delete booking (protected)
-- `GET /api/bookings/admin/all` - Get all bookings (admin only)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/bookings` | Yes | Get user's bookings |
+| GET | `/api/bookings/:id` | Yes | Get single booking |
+| POST | `/api/bookings` | Yes | Create booking |
+| PUT | `/api/bookings/:id` | Yes | Update booking |
+| DELETE | `/api/bookings/:id` | Yes | Delete booking |
+| GET | `/api/bookings/admin/all` | Admin | Get all bookings |
 
 ### Contact (`/api/contact`)
-- `POST /api/contact` - Submit contact form
-- `GET /api/contact` - Get all messages (admin only)
-- `PUT /api/contact/:id` - Update message status (admin only)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/contact` | No | Submit contact form |
+| GET | `/api/contact` | Admin | Get all messages |
+| PUT | `/api/contact/:id` | Admin | Update message status |
 
-### Health Check
-- `GET /api/health` - API health check
+### Health
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/health` | No | API health check |
 
-For detailed API documentation, see [backend/README.md](backend/README.md)
-
-## Usage
-
-### For Customers
-
-1. **Browse Services**: Navigate through the site to view available services and pricing
-2. **Register/Login**: Create an account or login to access the booking system
-3. **Book a Service**: Fill out the booking form with your pet's details and preferred time
-4. **Manage Bookings**: Access your dashboard to view and manage your bookings
-5. **Update Profile**: Update your contact information from the dashboard
-
-### For Developers
-
-#### Testing API Endpoints
-
-Use tools like Postman, Insomnia, or Thunder Client:
-
+**Example Usage:**
 ```bash
-# Register a new user
+# Register
 curl -X POST http://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "555-123-4567",
-    "password": "Password123"
-  }'
+  -d '{"name":"John Doe","email":"john@example.com","phone":"555-1234","password":"Password123"}'
 
-# Login
-curl -X POST http://localhost:5001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "Password123"
-  }'
-
-# Create booking (requires auth token)
+# Create booking
 curl -X POST http://localhost:5001/api/bookings \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{
-    "dogName": "Max",
-    "dogBreed": "Golden Retriever",
-    "service": "Daily Walk (30 min)",
-    "date": "2025-01-15",
-    "time": "10:00 AM",
-    "duration": "30 min"
-  }'
+  -d '{"dogName":"Max","dogBreed":"Golden Retriever","service":"Daily Walk (30 min)","date":"2025-01-15","time":"10:00 AM"}'
 ```
 
-## Database Models
+For detailed API documentation, see [backend/README.md](backend/README.md)
 
-### User
+## 🗄 Database
+
+### Data Models
+
+**User Schema**
 - name, email (unique), phone, password (hashed)
 - memberSince, role (user/admin)
 
-### Booking
+**Booking Schema**
 - user (ref), dogName, dogBreed, service
 - date, time, duration, specialInstructions
-- status (pending/confirmed/completed/cancelled)
-- price
+- status (pending/confirmed/completed/cancelled), price
 
-### Contact
+**Contact Schema**
 - name, email, phone, message
-- status (new/in-progress/resolved)
-- createdAt
+- status (new/in-progress/resolved), createdAt
 
-## Working with MongoDB
+### MongoDB Operations
 
-### Accessing MongoDB Shell
-
+**Quick Database Commands:**
 ```bash
-# Connect to your database
-mongosh mongodb://localhost:27017/empirestatewalkers
-```
+# View all collections
+mongosh mongodb://localhost:27017/empirestatewalkers --eval "db.getCollectionNames()"
 
-### Common Database Operations
+# Count users
+mongosh mongodb://localhost:27017/empirestatewalkers --eval "db.users.countDocuments()"
 
-**View Collections:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.getCollectionNames()"
-```
+# Make user an admin
+mongosh mongodb://localhost:27017/empirestatewalkers --eval \
+  "db.users.updateOne({email: 'user@example.com'}, {\$set: {role: 'admin'}})"
 
-**View All Users:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.find().pretty()"
-```
-
-**Count Users:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.countDocuments()"
-```
-
-**Find User by Email:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.findOne({email: 'user@example.com'})"
-```
-
-**Make User an Admin:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.updateOne({email: 'user@example.com'}, {\$set: {role: 'admin'}})"
-```
-
-**Delete a User:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "db.users.deleteOne({email: 'user@example.com'})"
-```
-
-**View Database Statistics:**
-```bash
-mongosh mongodb://localhost:27017/empirestatewalkers --quiet --eval "
-  print('Total Users: ' + db.users.countDocuments());
-  print('Total Bookings: ' + db.bookings.countDocuments());
-  print('Total Contacts: ' + db.contacts.countDocuments());
+# View database statistics
+mongosh mongodb://localhost:27017/empirestatewalkers --eval "
+  print('Users: ' + db.users.countDocuments());
+  print('Bookings: ' + db.bookings.countDocuments());
+  print('Contacts: ' + db.contacts.countDocuments());
 "
-```
 
-**Export Collection to JSON:**
-```bash
-mongoexport --db=empirestatewalkers --collection=users --out=users_backup.json --pretty
-```
-
-**Import Collection from JSON:**
-```bash
-mongoimport --db=empirestatewalkers --collection=users --file=users_backup.json
-```
-
-**Backup Entire Database:**
-```bash
+# Backup database
 mongodump --db=empirestatewalkers --out=/path/to/backup
-```
 
-**Restore Database:**
-```bash
+# Restore database
 mongorestore --db=empirestatewalkers /path/to/backup/empirestatewalkers
 ```
 
-### Interactive MongoDB Shell Commands
+**Interactive Shell:**
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers
 
-Once connected with `mongosh mongodb://localhost:27017/empirestatewalkers`:
-
-```javascript
-// View all users
-db.users.find().pretty()
-
-// Find users by criteria
-db.users.find({role: "admin"})
-db.users.find({name: /Brandon/i})  // Case-insensitive search
-
-// Sort users by creation date
-db.users.find().sort({createdAt: -1})
-
-// Select specific fields only
-db.users.find({}, {name: 1, email: 1, _id: 0})
-
-// View all bookings
-db.bookings.find().pretty()
-
-// Find bookings for a specific user
-db.bookings.find({user: ObjectId("user_id_here")})
-
-// Find pending bookings
-db.bookings.find({status: "pending"})
-
-// Update booking status
-db.bookings.updateOne(
-  {_id: ObjectId("booking_id_here")},
-  {$set: {status: "confirmed"}}
-)
-
-// View all contact submissions
-db.contacts.find().pretty()
-
-// Exit shell
-exit
+# Inside shell:
+db.users.find().pretty()                    // View all users
+db.bookings.find({status: "pending"})        // Find pending bookings
+db.users.find({role: "admin"})              // Find admin users
 ```
 
-## Input Validation Requirements
-
-All API endpoints enforce strict validation rules to ensure data integrity and security:
-
-### User Registration
-- **Name**: Required, 2-50 characters
-- **Email**: Required, valid email format, normalized (lowercase)
-- **Phone**: Required, valid phone format
-- **Password**: Required, minimum 8 characters, must contain:
-  - At least one uppercase letter
-  - At least one lowercase letter
-  - At least one number
-
-### Booking Creation/Update
-- **Dog Name**: Required, 2-50 characters
-- **Dog Breed**: Required, 2-50 characters
-- **Service**: Required, must be one of:
-  - "Daily Walk (30 min)" - $25
-  - "Daily Walk (60 min)" - $35
-  - "Pet Sitting" - $40
-  - "Emergency Visit" - $50
-  - "Other" - Custom pricing
-- **Date**: Required, must be today or future date (format: YYYY-MM-DD)
-- **Time**: Required, valid time format (HH:MM AM/PM)
-- **Duration**: Optional, 2-50 characters
-- **Special Instructions**: Optional, maximum 500 characters
-- **Status**: Optional for updates, one of: pending, confirmed, completed, cancelled
-
-### Contact Form
-- **Name**: Required, 2-50 characters
-- **Email**: Required, valid email format
-- **Phone**: Optional, valid phone format if provided
-- **Message**: Required, 10-1000 characters
-
-All validation errors return a 400 status code with detailed error messages indicating which fields failed validation and why.
-
-## Security Features
+## 🛡 Security
 
 ### Authentication & Authorization
-- **Password Security**: Bcrypt hashing with 10 salt rounds
-- **JWT Authentication**: Token-based auth with configurable expiration (default: 30 days)
-- **Protected Routes**: Middleware-based route protection with JWT verification
-- **Role-Based Access Control**: User and admin role separation with authorization middleware
+- **Password Security** - bcrypt hashing with 10 salt rounds
+- **JWT Authentication** - Token-based auth with 30-day expiration
+- **Protected Routes** - Middleware-based route protection
+- **Role-Based Access** - User/admin separation with authorization checks
 
-### Input Protection
-- **Comprehensive Input Validation**: Express-validator on all endpoints with detailed rules:
-  - Email validation and normalization
-  - Password strength requirements (8+ chars, uppercase, lowercase, number)
-  - Phone number format validation
-  - Date validation (prevents past date bookings)
-  - Message length limits (10-1000 characters)
-  - Service type enum validation
+### Input Validation
+All endpoints enforce strict validation:
+
+**User Registration:**
+- Name: 2-50 characters
+- Email: Valid format, normalized to lowercase
+- Phone: Valid phone format
+- Password: 8+ characters with uppercase, lowercase, and number
+
+**Booking Creation:**
+- Dog Name/Breed: 2-50 characters
+- Service: Must match predefined services
+- Date: Must be today or future date (YYYY-MM-DD)
+- Time: Valid time format (HH:MM AM/PM)
+- Special Instructions: Max 500 characters
+
+**Contact Form:**
+- Name: 2-50 characters
+- Email: Valid format
+- Message: 10-1000 characters
 
 ### Rate Limiting
-- **Brute-Force Protection**: Express-rate-limit middleware
-  - General API: 100 requests per 15 minutes per IP
-  - Auth endpoints: 5 login attempts per 15 minutes per IP
-  - Skips counting successful authentication requests
+- **General API:** 100 requests per 15 minutes per IP
+- **Auth Endpoints:** 5 login attempts per 15 minutes per IP
+- Successful auth requests don't count toward limit
 
-### Data Protection
-- **Field Filtering**: Sensitive data (passwords) excluded from API responses
-- **Error Handling**: Centralized error handler with production/development modes
-  - No stack traces in production
-  - Specific handling for JWT, Mongoose, and validation errors
-  - Generic error messages to prevent information leakage
+### Additional Security
+- **Helmet.js** - Secure HTTP headers
+- **CORS** - Configurable origin via environment variable
+- **Field Filtering** - Passwords excluded from API responses
+- **Error Handling** - No stack traces in production
+- **404 Handler** - Catches undefined routes
 
-### Network Security
-- **CORS Configuration**: Configurable origin via environment variable
-- **404 Handler**: Catches undefined routes
-- **Uncaught Exception Handler**: Graceful error handling for unexpected errors
-
-## Service Area
-
-Currently serving:
-- Upper East Side, Manhattan
-- Upper West Side, Manhattan
-- Midtown, Manhattan
-- Lower East Side, Manhattan
-- Lower West Side, Manhattan
-- Astoria, Queens
-- Long Island City, Queens
-
-## Contact Information
-
-- **Phone**: (555) 123-4567
-- **Email**: walk@esw.dog
-- **Hours**: Available 7am - 9pm daily
-
-## Deployment
+## 🚢 Deployment
 
 ### Backend Deployment
 
-Recommended platforms:
-- **Railway**: Modern platform with MongoDB support
-- **Render**: Free tier available
-- **Heroku**: With MongoDB Atlas integration
-- **DigitalOcean**: VPS with full control
-- **AWS/GCP/Azure**: Enterprise solutions
+**Recommended Platforms:**
+- **Railway** - Modern platform with MongoDB support
+- **Render** - Free tier available
+- **Heroku** - With MongoDB Atlas integration
+- **DigitalOcean** - VPS with full control
 
 **Production Environment Variables:**
 ```env
@@ -522,134 +346,130 @@ PORT=5001
 MONGODB_URI=your_production_mongodb_uri
 JWT_SECRET=strong_production_secret_key
 JWT_EXPIRE=30d
-CORS_ORIGIN=https://your-production-frontend-domain.com
+CORS_ORIGIN=https://your-production-domain.com
 ```
 
-**Important**: Always update `CORS_ORIGIN` to match your production frontend URL for security.
+⚠️ **Important:** Always update `CORS_ORIGIN` to match your production frontend URL
 
 ### Frontend Deployment
 
-Deploy to:
-- **Netlify**: Easy static site deployment
-- **Vercel**: Optimized for frontend
-- **GitHub Pages**: Free hosting
-- **AWS S3 + CloudFront**: Enterprise CDN solution
+**Recommended Platforms:**
+- **Netlify** - Easy static site deployment
+- **Vercel** - Optimized for frontend
+- **GitHub Pages** - Free hosting
+- **AWS S3 + CloudFront** - Enterprise CDN
 
-## Recent Updates
+## 🔧 Troubleshooting
 
-### November 2025: Registration Bug Fix & Configuration Updates
+### Backend Won't Start
+- ✓ Ensure MongoDB is running: `brew services start mongodb-community`
+- ✓ Check `.env` file exists with correct values
+- ✓ Verify dependencies installed: `npm install`
+- ✓ Check port 5001 is not in use
+- **macOS:** Port 5000 conflicts with AirPlay Receiver (use 5001 or disable AirPlay in System Settings)
 
-**Bug Fixes:**
-- Fixed registration failure due to password validation mismatch:
-  - Frontend form required minimum 6 characters
-  - Backend validator required minimum 8 characters with complexity rules
-  - User model required minimum 6 characters
-  - **Resolution**: Standardized all validation to 8 characters minimum with uppercase, lowercase, and number requirements
-- Added HTML5 pattern validation on registration form with user-friendly error messages
-- Enhanced frontend error handling to display detailed validation errors from backend
+### Frontend Can't Connect to API
+- ✓ Backend server running on port 5001
+- ✓ `API_URL` in `frontend-api.js` matches backend URL
+- ✓ `CORS_ORIGIN` in backend `.env` matches frontend URL
+- ✓ Check browser console for detailed errors
 
-**Configuration Changes:**
-- Changed default backend port from 5000 to 5001 to avoid conflicts with macOS AirPlay Receiver
-- Updated frontend API URL to `http://localhost:5001/api`
-- Updated CORS configuration to allow all origins in development mode for easier testing
-- Updated all documentation and examples to reflect new port configuration
+### Authentication Issues
+- ✓ Clear browser localStorage and cookies
+- ✓ Verify `JWT_SECRET` is set in backend `.env`
+- ✓ Check token hasn't expired (30-day default)
+- ✓ Password meets requirements (8+ chars, uppercase, lowercase, number)
+- ✓ If "Too many requests" error, wait 15 minutes (rate limit)
 
-**Improvements:**
-- Added client-side password strength validation before API submission
-- Improved error messages to show which fields failed validation and why
-- Added MongoDB query examples and database management guide
-- Enhanced troubleshooting section with macOS-specific issues
+## 📂 Project Structure
 
-**Testing:**
-- Verified registration endpoint with valid credentials
-- Tested password validation rejection for weak passwords
-- Confirmed user data is properly stored in MongoDB with bcrypt-hashed passwords
-- Validated CORS functionality across different origins
+```
+empirestatewalkers/
+├── frontend/
+│   ├── index.html              # Main HTML file
+│   ├── styles.css              # Custom CSS styles
+│   └── frontend-api.js         # Frontend with full API integration
+├── backend/
+│   ├── config/
+│   │   ├── database.js         # MongoDB connection
+│   │   ├── services.js         # Service pricing configuration
+│   │   ├── logger.js           # Winston logger setup
+│   │   └── morganStream.js     # Morgan HTTP logger stream
+│   ├── controllers/
+│   │   ├── authController.js   # Authentication logic
+│   │   ├── bookingController.js # Booking CRUD operations
+│   │   └── contactController.js # Contact form handling
+│   ├── middleware/
+│   │   ├── auth.js             # JWT authentication & authorization
+│   │   ├── errorHandler.js     # Global error handler
+│   │   ├── validators.js       # Input validation rules
+│   │   └── validateObjectId.js # MongoDB ObjectId validator
+│   ├── models/
+│   │   ├── User.js             # User schema
+│   │   ├── Booking.js          # Booking schema
+│   │   └── Contact.js          # Contact schema
+│   ├── routes/
+│   │   ├── authRoutes.js       # Auth endpoints with rate limiting
+│   │   ├── bookingRoutes.js    # Booking endpoints with validation
+│   │   └── contactRoutes.js    # Contact endpoints
+│   ├── utils/
+│   │   └── generateToken.js    # JWT token generator
+│   ├── .env.example            # Environment variables template
+│   ├── package.json            # Backend dependencies
+│   ├── server.js               # Express server entry point
+│   └── README.md               # Backend documentation
+└── README.md                   # This file
+```
 
-### Previous Refactor: Security & Code Quality Improvements
+## 🔄 Recent Updates
 
-Major updates focused on production-readiness, security hardening, and code maintainability:
+### November 2025: Security Hardening & Production Readiness
+- ✅ Fixed all HIGH severity security vulnerabilities (100% elimination)
+- ✅ Upgraded to secure dependency versions (helmet 8.1.0, winston 3.18.3, csrf-sync 4.2.1)
+- ✅ Added comprehensive logging with Winston
+- ✅ Implemented HTTP request logging with Morgan
+- ✅ Enhanced rate limiting configuration
+- ✅ Fixed registration bug with password validation standardization
+- ✅ Changed default port from 5000 to 5001 (macOS AirPlay compatibility)
+- ✅ Added MongoDB query examples and database management guide
+- ✅ Improved error messages and validation feedback
 
-**Security Enhancements:**
-- Added rate limiting middleware (express-rate-limit) to prevent brute-force attacks
-- Implemented comprehensive input validation on all endpoints using express-validator
-- Enhanced error handler with specific JWT and Mongoose error handling
-- Added field filtering to prevent password leakage in API responses
-- Configured CORS via environment variable for better security control
-- Added 404 handler and uncaught exception handler
+## 🚧 Future Enhancements
 
-**Code Quality Improvements:**
-- Extracted service pricing to configuration file (`backend/config/services.js`)
-- Created validation middleware module (`backend/middleware/validators.js`)
-- Simplified controller logic with helper functions
-- Fixed User model pre-hook bug (missing return statement)
-- Removed deprecated Mongoose connection options
-- Updated Contact model status enum (new/in-progress/resolved)
-- Improved code consistency and reduced duplication
-
-**Frontend Improvements:**
-- Removed insecure `script.js` file that stored passwords in plain text
-- Updated `index.html` to use only secure `frontend-api.js`
-
-**Developer Experience:**
-- Updated `.env.example` with all configuration options
-- Enhanced error messages for better debugging
-- Consistent code style across all files
-- Better structured validation error responses
-
-## Future Enhancements
-
-### Planned Features
 - [ ] Email notifications (SendGrid/Nodemailer)
 - [ ] Payment processing (Stripe integration)
 - [ ] SMS notifications (Twilio)
 - [ ] Photo upload for pet profiles (AWS S3)
 - [ ] Real-time updates (Socket.io)
 - [ ] Admin dashboard interface
-- [ ] Automated testing suite
+- [ ] Automated testing suite (Jest/Mocha)
 - [ ] API documentation (Swagger/OpenAPI)
-- [ ] Rate limiting and request throttling
 - [ ] Caching with Redis
-- [ ] Walk tracking with GPS integration
+- [ ] Walk tracking with GPS
 - [ ] Review and rating system
-- [ ] Real-time availability calendar
 - [ ] Push notifications
 
-## Contributing
+## 🤝 Contributing
 
 This is a private project. For inquiries about modifications or features, please contact the owner.
 
-## License
+## 📞 Contact
+
+- **Phone:** (555) 123-4567
+- **Email:** walk@esw.dog
+- **Hours:** 7am - 9pm daily
+- **GitHub Issues:** [Create an issue](https://github.com/Rubelefsky/empirestatewalkers/issues)
+
+## 📄 License
 
 Copyright © 2025 Empire State Walkers. All rights reserved.
 
-## Troubleshooting
+---
 
-### Backend won't start
-- Ensure MongoDB is running: `brew services start mongodb-community` (macOS)
-- Check `.env` file exists and has correct values
-- Verify all dependencies are installed: `npm install`
-- Check port 5001 is not already in use
-- **macOS Issue**: If port 5000 is in use, it's likely AirPlay Receiver. Either:
-  - Use port 5001 (recommended, already configured)
-  - Disable AirPlay Receiver in System Settings > General > AirDrop & Handoff
+<div align="center">
 
-### Frontend can't connect to API
-- Ensure backend server is running on port 5001
-- Check API_URL in `frontend-api.js` matches backend URL (`http://localhost:5001/api`)
-- Verify `CORS_ORIGIN` in backend `.env` matches your frontend URL
-- Check browser console for detailed error messages
-- In development, CORS allows all origins for easier testing
+**Built with ❤️ for Manhattan's four-legged friends**
 
-### Authentication issues
-- Clear browser localStorage and cookies
-- Verify JWT_SECRET is set in backend `.env`
-- Check token hasn't expired (default: 30 days)
-- Ensure password meets requirements (8+ chars, uppercase, lowercase, number)
-- If getting "Too many requests" error, wait 15 minutes (rate limit protection)
+[⬆ Back to Top](#-empire-state-walkers)
 
-## Support
-
-For technical support or business inquiries:
-- Email: walk@esw.dog
-- GitHub Issues: [Create an issue](https://github.com/Rubelefsky/empirestatewalkers/issues)
+</div>
