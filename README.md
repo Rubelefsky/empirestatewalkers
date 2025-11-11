@@ -19,6 +19,7 @@
 
 - [Overview](#-overview)
 - [Features](#-features)
+  - [Dashboard Features](#dashboard-features)
 - [Quick Start](#-quick-start)
 - [Technology Stack](#-technology-stack)
 - [Installation](#-installation)
@@ -42,10 +43,12 @@ Empire State Walkers is a modern, full-stack web application for a professional 
 - 🔐 **Secure Authentication** - JWT-based auth with bcrypt password hashing
 - ✅ **Input Validation** - Comprehensive server-side validation with express-validator
 - 📅 **Booking System** - Full CRUD operations with automated pricing and status tracking
-- 👤 **Customer Dashboard** - Personalized booking and account management
-- 📧 **Contact Management** - Integrated contact form with admin tracking
+- 👤 **User Dashboard** - Personalized booking management with create, edit, and cancel capabilities
+- 👑 **Admin Dashboard** - Comprehensive admin interface with booking oversight and contact message management
+- 📊 **Real-time Statistics** - Live booking stats with status breakdowns (pending, confirmed, completed)
+- 📧 **Contact Management** - Integrated contact form with admin tracking and status updates
 - 🛡️ **Rate Limiting** - Brute-force protection on all endpoints
-- 👑 **Role-Based Access** - User and admin roles with protected routes
+- 🔒 **Role-Based Access** - User and admin roles with protected routes
 
 ### Services Offered
 | Service | Duration | Price |
@@ -57,6 +60,25 @@ Empire State Walkers is a modern, full-stack web application for a professional 
 | Additional Services | - | Custom pricing |
 
 *Additional services include grooming, training, transportation, and photo sessions*
+
+### Dashboard Features
+
+**User Dashboard** (`index.html`)
+- 📝 **Create Bookings** - Interactive modal form with service selection, date/time pickers, and special instructions
+- ✏️ **Edit Bookings** - Modify pending bookings with full form validation
+- ❌ **Cancel Bookings** - Cancel bookings with confirmation dialog
+- 📋 **View Bookings** - See all your bookings with visual status indicators
+- 👤 **Account Info** - View email, member since date, and total booking count
+- 🎨 **Responsive Design** - Optimized for mobile, tablet, and desktop
+
+**Admin Dashboard** (`admin.html`)
+- 📊 **Statistics Overview** - Real-time cards showing total, pending, confirmed, and completed bookings
+- 📋 **All Bookings View** - See bookings from all users with filtering by status
+- ✅ **Status Management** - Update booking status (pending → confirmed → completed)
+- 🔍 **Detailed Views** - Modal dialogs with comprehensive booking and customer information
+- 💬 **Contact Messages** - View and manage contact form submissions with status tracking
+- 🗂️ **Tab Navigation** - Switch between bookings and messages tabs
+- 🔐 **Admin-Only Access** - Accessible only to users with admin role
 
 ## 🚀 Quick Start
 
@@ -84,6 +106,11 @@ python3 -m http.server 8080
 ```
 
 **Test Login:** Register with password format: `Password123` (8+ chars, uppercase, lowercase, number)
+
+**Access Dashboards:**
+- **User Dashboard:** Log in at `http://localhost:8080` and click "Dashboard" link
+- **Admin Dashboard:** Navigate to `http://localhost:8080/admin.html` (requires admin role)
+- **Make user admin:** See [Database](#-database) section for MongoDB command
 
 ## 🛠 Technology Stack
 
@@ -386,7 +413,10 @@ CORS_ORIGIN=https://your-production-domain.com
 ```
 empirestatewalkers/
 ├── frontend/
-│   ├── index.html              # Main HTML file
+│   ├── index.html              # Main HTML file with user dashboard
+│   ├── admin.html              # Admin dashboard interface
+│   ├── admin.js                # Admin dashboard functionality
+│   ├── admin.css               # Admin-specific styles
 │   ├── styles.css              # Custom CSS styles
 │   └── frontend-api.js         # Frontend with full API integration
 ├── backend/
@@ -423,6 +453,18 @@ empirestatewalkers/
 
 ## 🔄 Recent Updates
 
+### November 2025: Comprehensive Dashboard Implementation
+- ✅ **User Dashboard** - Full booking management with create, edit, and cancel capabilities
+- ✅ **Admin Dashboard** - Complete admin interface at `/admin.html` with:
+  - Real-time statistics (total, pending, confirmed, completed bookings)
+  - All-user booking view with status filtering
+  - Booking status management workflow
+  - Contact message tracking with status updates
+  - Tab-based navigation between bookings and messages
+- ✅ **Enhanced UI** - Modal dialogs, status badges, and responsive design
+- ✅ **XSS Protection** - Secure DOM manipulation throughout
+- ✅ **Date Validation** - Prevention of past-date bookings
+
 ### November 2025: Security Hardening & Production Readiness
 - ✅ Fixed all HIGH severity security vulnerabilities (100% elimination)
 - ✅ Upgraded to secure dependency versions (helmet 8.1.0, winston 3.18.3, csrf-sync 4.2.1)
@@ -441,13 +483,14 @@ empirestatewalkers/
 - [ ] SMS notifications (Twilio)
 - [ ] Photo upload for pet profiles (AWS S3)
 - [ ] Real-time updates (Socket.io)
-- [ ] Admin dashboard interface
 - [ ] Automated testing suite (Jest/Mocha)
 - [ ] API documentation (Swagger/OpenAPI)
 - [ ] Caching with Redis
 - [ ] Walk tracking with GPS
 - [ ] Review and rating system
 - [ ] Push notifications
+- [ ] Calendar view for bookings
+- [ ] Export booking data (CSV/PDF)
 
 ## 🤝 Contributing
 
