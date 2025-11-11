@@ -6,8 +6,10 @@ exports.protect = async (req, res, next) => {
     try {
         let token;
 
-        // Extract token from Authorization header
-        if (req.headers.authorization?.startsWith('Bearer')) {
+        // Extract token from httpOnly cookie (preferred) or Authorization header (fallback)
+        if (req.cookies.token) {
+            token = req.cookies.token;
+        } else if (req.headers.authorization?.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
         }
 

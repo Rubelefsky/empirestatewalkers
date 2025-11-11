@@ -48,10 +48,25 @@ MONGODB_URI=mongodb://localhost:27017/empirestatewalkers
 # OR for MongoDB Atlas:
 # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/empirestatewalkers
 
-JWT_SECRET=esw_super_secret_jwt_key_change_this_in_production_12345
+# SECURITY: Generate a strong JWT secret using: openssl rand -base64 32
+# NEVER use the example below in production - generate your own!
+JWT_SECRET=REPLACE_WITH_SECURE_RANDOM_STRING_USE_OPENSSL_RAND_BASE64_32
 JWT_EXPIRE=30d
 NODE_ENV=development
 ```
+
+**⚠️ IMPORTANT SECURITY NOTE:**
+Before deploying to production, you MUST generate a cryptographically secure JWT secret:
+
+```bash
+# Generate a secure JWT secret (Linux/macOS)
+openssl rand -base64 32
+
+# Or using Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Copy the generated string and use it as your `JWT_SECRET` in production.
 
 ### 4. Start the Backend Server
 
