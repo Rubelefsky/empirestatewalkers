@@ -24,6 +24,43 @@ class EmpireStateWalkers {
 
         // Authentication
         this.setupAuthEventListeners();
+
+        // Booking management
+        this.setupBookingEventListeners();
+    }
+
+    setupBookingEventListeners() {
+        // Create booking button
+        const createBookingBtn = document.getElementById('create-booking-btn');
+        if (createBookingBtn) {
+            createBookingBtn.addEventListener('click', () => this.showBookingModal());
+        }
+
+        // Booking form submit
+        const bookingForm = document.getElementById('booking-form');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', (e) => this.handleBookingSubmit(e));
+        }
+
+        // Close booking modal
+        const closeBookingModal = document.getElementById('close-booking-modal');
+        const cancelBookingBtn = document.getElementById('cancel-booking-btn');
+        if (closeBookingModal) {
+            closeBookingModal.addEventListener('click', () => this.hideBookingModal());
+        }
+        if (cancelBookingBtn) {
+            cancelBookingBtn.addEventListener('click', () => this.hideBookingModal());
+        }
+
+        // Close modal on outside click
+        const bookingModal = document.getElementById('booking-modal');
+        if (bookingModal) {
+            bookingModal.addEventListener('click', (e) => {
+                if (e.target === bookingModal) {
+                    this.hideBookingModal();
+                }
+            });
+        }
     }
 
     checkAuthState() {
@@ -353,7 +390,7 @@ class EmpireStateWalkers {
     }
 
     async updateDashboard() {
-        if (!this.currentUser || !this.token) return;
+        if (!this.currentUser) return;
 
         // Update user name
         const dashboardUserName = document.getElementById('dashboard-user-name');
@@ -370,7 +407,7 @@ class EmpireStateWalkers {
         // Update member since
         const dashboardMemberSince = document.getElementById('dashboard-member-since');
         if (dashboardMemberSince) {
-            const date = new Date(this.currentUser.memberSince);
+            const date = new Date(this.currentUser.createdAt || Date.now());
             dashboardMemberSince.textContent = date.toLocaleDateString('en-US', {
                 month: 'long',
                 year: 'numeric'
@@ -423,48 +460,195 @@ class EmpireStateWalkers {
             return;
         }
 
+        // Sort bookings by date (most recent first)
+        bookings.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         // Create booking elements using DOM manipulation to prevent XSS
         bookings.forEach(booking => {
             const bookingDiv = document.createElement('div');
-            bookingDiv.style.cssText = 'border: 1px solid #000; padding: 16px; margin-bottom: 16px;';
+            bookingDiv.className = 'booking-item';
 
-            // Dog name and service row
+            // Header with dog name and status
             const headerDiv = document.createElement('div');
-            headerDiv.style.marginBottom = '8px';
+            headerDiv.className = 'booking-header';
 
-            const dogNameStrong = document.createElement('strong');
-            dogNameStrong.textContent = booking.dogName; // Safe: textContent auto-escapes
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'booking-title';
+            titleDiv.textContent = booking.dogName;
 
-            const serviceSpan = document.createElement('span');
-            serviceSpan.style.color = '#808080';
-            serviceSpan.textContent = ' — ' + booking.service; // Safe: textContent auto-escapes
-
-            headerDiv.appendChild(dogNameStrong);
-            headerDiv.appendChild(serviceSpan);
-
-            // Date and time row
-            const dateDiv = document.createElement('div');
-            dateDiv.style.cssText = 'font-size: 14px; color: #808080;';
-            dateDiv.textContent = new Date(booking.date).toLocaleDateString() + ' at ' + booking.time;
-
-            // Status row
-            const statusDiv = document.createElement('div');
-            statusDiv.style.cssText = 'font-size: 14px; margin-top: 4px;';
-
-            const statusLabel = document.createTextNode('Status: ');
             const statusSpan = document.createElement('span');
-            statusSpan.style.textTransform = 'capitalize';
-            statusSpan.textContent = booking.status; // Safe: textContent auto-escapes
+            statusSpan.className = `booking-status ${booking.status}`;
+            statusSpan.textContent = booking.status;
 
-            statusDiv.appendChild(statusLabel);
-            statusDiv.appendChild(statusSpan);
+            headerDiv.appendChild(titleDiv);
+            headerDiv.appendChild(statusSpan);
+
+            // Service and breed info
+            const infoDiv1 = document.createElement('div');
+            infoDiv1.className = 'booking-info';
+            infoDiv1.textContent = `${booking.service} • ${booking.dogBreed}`;
+
+            // Date and time info
+            const infoDiv2 = document.createElement('div');
+            infoDiv2.className = 'booking-info';
+            const bookingDate = new Date(booking.date);
+            infoDiv2.textContent = `${bookingDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            })} at ${booking.time} (${booking.duration} min)`;
+
+            // Notes if available
+            let notesDiv = null;
+            if (booking.notes) {
+                notesDiv = document.createElement('div');
+                notesDiv.className = 'booking-info';
+                notesDiv.textContent = `Notes: ${booking.notes}`;
+            }
+
+            // Action buttons (only for pending bookings)
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'booking-actions';
+
+            if (booking.status === 'pending') {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-minimal btn-small';
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', () => this.showBookingModal(booking));
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn-minimal btn-small btn-danger';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.addEventListener('click', () => this.cancelBooking(booking._id));
+
+                actionsDiv.appendChild(editBtn);
+                actionsDiv.appendChild(cancelBtn);
+            }
 
             // Append all elements
             bookingDiv.appendChild(headerDiv);
-            bookingDiv.appendChild(dateDiv);
-            bookingDiv.appendChild(statusDiv);
+            bookingDiv.appendChild(infoDiv1);
+            bookingDiv.appendChild(infoDiv2);
+            if (notesDiv) bookingDiv.appendChild(notesDiv);
+            if (actionsDiv.children.length > 0) bookingDiv.appendChild(actionsDiv);
+
             bookingsList.appendChild(bookingDiv);
         });
+    }
+
+    showBookingModal(booking = null) {
+        const modal = document.getElementById('booking-modal');
+        const modalTitle = document.getElementById('booking-modal-title');
+        const form = document.getElementById('booking-form');
+
+        if (!modal || !form) return;
+
+        // Reset form
+        form.reset();
+
+        if (booking) {
+            // Edit mode
+            modalTitle.textContent = 'Edit Booking';
+            document.getElementById('booking-id').value = booking._id;
+            document.getElementById('booking-dog-name').value = booking.dogName;
+            document.getElementById('booking-dog-breed').value = booking.dogBreed;
+            document.getElementById('booking-dog-age').value = booking.dogAge;
+            document.getElementById('booking-service').value = booking.service;
+            // Convert ISO date to YYYY-MM-DD format
+            const bookingDate = new Date(booking.date);
+            document.getElementById('booking-date').value = bookingDate.toISOString().split('T')[0];
+            document.getElementById('booking-time').value = booking.time;
+            document.getElementById('booking-duration').value = booking.duration;
+            document.getElementById('booking-notes').value = booking.notes || '';
+        } else {
+            // Create mode
+            modalTitle.textContent = 'New Booking';
+            document.getElementById('booking-id').value = '';
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('booking-date').min = today;
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    hideBookingModal() {
+        const modal = document.getElementById('booking-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    async handleBookingSubmit(e) {
+        e.preventDefault();
+
+        const bookingId = document.getElementById('booking-id').value;
+        const bookingData = {
+            dogName: document.getElementById('booking-dog-name').value,
+            dogBreed: document.getElementById('booking-dog-breed').value,
+            dogAge: parseInt(document.getElementById('booking-dog-age').value),
+            service: document.getElementById('booking-service').value,
+            date: document.getElementById('booking-date').value,
+            time: document.getElementById('booking-time').value,
+            duration: parseInt(document.getElementById('booking-duration').value),
+            notes: document.getElementById('booking-notes').value
+        };
+
+        try {
+            const url = bookingId
+                ? `${API_URL}/bookings/${bookingId}`
+                : `${API_URL}/bookings`;
+
+            const method = bookingId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(bookingData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(bookingId ? 'Booking updated successfully!' : 'Booking created successfully!');
+                this.hideBookingModal();
+                await this.fetchAndRenderBookings();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Booking submission error:', error);
+            alert('Error submitting booking. Please try again.');
+        }
+    }
+
+    async cancelBooking(bookingId) {
+        if (!confirm('Are you sure you want to cancel this booking?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/bookings/${bookingId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Booking cancelled successfully!');
+                await this.fetchAndRenderBookings();
+            } else {
+                alert('Error cancelling booking: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error cancelling booking:', error);
+            alert('Error cancelling booking. Please try again.');
+        }
     }
 }
 
