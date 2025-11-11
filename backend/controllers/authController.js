@@ -39,6 +39,8 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access  Public
 exports.register = async (req, res) => {
     try {
+        // Explicitly whitelist allowed fields to prevent privilege escalation
+        // Users cannot set their own role - it defaults to 'user' from schema
         const { name, email, phone, password } = req.body;
 
         const userExists = await User.findOne({ email });
@@ -50,7 +52,16 @@ exports.register = async (req, res) => {
             });
         }
 
-        const user = await User.create({ name, email, phone, password });
+        // Only create user with whitelisted fields
+        // Role will default to 'user' from schema
+        const user = await User.create({
+            name,
+            email,
+            phone,
+            password
+            // Explicitly NOT including 'role' - prevents privilege escalation
+        });
+
         sendTokenResponse(user, 201, res);
     } catch (error) {
         console.error('Register error:', error);
@@ -118,8 +129,15 @@ exports.getMe = async (req, res) => {
 // @access  Private
 exports.updateDetails = async (req, res) => {
     try {
+        // Explicitly whitelist allowed fields
+        // Users cannot modify their own role
         const { name, email, phone } = req.body;
-        const fieldsToUpdate = { name, email, phone };
+        const fieldsToUpdate = {
+            name,
+            email,
+            phone
+            // Explicitly NOT including 'role' - prevents privilege escalation
+        };
 
         const user = await User.findByIdAndUpdate(
             req.user.id,

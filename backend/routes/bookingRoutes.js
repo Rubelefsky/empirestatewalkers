@@ -12,6 +12,7 @@ const {
     createBookingValidation,
     updateBookingValidation
 } = require('../middleware/validators');
+const validateObjectId = require('../middleware/validateObjectId');
 
 const router = express.Router();
 
@@ -22,9 +23,10 @@ router.route('/')
 router.route('/admin/all')
     .get(protect, authorize('admin'), getAllBookings);
 
+// Apply ObjectId validation to routes with :id parameter
 router.route('/:id')
-    .get(protect, getBooking)
-    .put(protect, updateBookingValidation, updateBooking)
-    .delete(protect, deleteBooking);
+    .get(protect, validateObjectId(), getBooking)
+    .put(protect, validateObjectId(), updateBookingValidation, updateBooking)
+    .delete(protect, validateObjectId(), deleteBooking);
 
 module.exports = router;
