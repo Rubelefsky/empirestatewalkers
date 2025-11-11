@@ -188,13 +188,45 @@ exports.deleteBooking = async (req, res) => {
 // @access  Private/Admin
 exports.getAllBookings = async (req, res) => {
     try {
+        // Pagination parameters with defaults
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 50;
+        const skip = (page - 1) * limit;
+
+        // Validate pagination parameters
+        if (page < 1 || limit < 1 || limit > 100) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid pagination parameters. Page must be >= 1, limit must be between 1 and 100'
+            });
+        }
+
+        // Get total count for pagination metadata
+        const total = await Booking.countDocuments();
+
+        // Get paginated bookings
         const bookings = await Booking.find()
             .populate('user', 'name email phone')
-            .sort('-createdAt');
+            .sort('-createdAt')
+            .skip(skip)
+            .limit(limit);
+
+        // Calculate pagination metadata
+        const totalPages = Math.ceil(total / limit);
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
 
         res.json({
             success: true,
             count: bookings.length,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage,
+                hasPrevPage
+            },
             data: bookings
         });
     } catch (error) {
