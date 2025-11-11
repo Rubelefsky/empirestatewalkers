@@ -1,166 +1,378 @@
-# Backend Setup Guide
+# 🚀 Backend Setup Guide
 
-This guide will help you set up and run the Empire State Walkers backend API.
+<div align="center">
 
-## Quick Start
+**Complete setup guide for Empire State Walkers backend API**
 
-### 1. Install MongoDB
+[![Node.js](https://img.shields.io/badge/Node.js-v14+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-v4.4+-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Express.js](https://img.shields.io/badge/Express.js-v4.18-000000?logo=express&logoColor=white)](https://expressjs.com/)
 
-**Option A: Local Installation**
+[Quick Start](#-quick-start) • [MongoDB Setup](#-install-mongodb) • [Configuration](#-configure-environment-variables) • [Testing](#-test-the-api) • [Troubleshooting](#-troubleshooting)
 
-**macOS:**
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Quick Start](#-quick-start)
+- [Install MongoDB](#-install-mongodb)
+- [Install Dependencies](#-install-backend-dependencies)
+- [Configure Environment](#-configure-environment-variables)
+- [Start Server](#-start-the-backend-server)
+- [Test the API](#-test-the-api)
+- [Frontend Integration](#-using-the-frontend-with-backend)
+- [Full Stack Testing](#-testing-the-full-stack)
+- [Troubleshooting](#-troubleshooting)
+- [API Testing](#-api-testing-with-curl)
+- [Development Tips](#-development-tips)
+- [Production Deployment](#-production-deployment)
+
+---
+
+## ⚡ Quick Start
+
+Get the backend running in 5 minutes:
+
+```bash
+# 1. Start MongoDB
+brew services start mongodb-community  # macOS
+# or: sudo systemctl start mongod      # Linux
+
+# 2. Install dependencies
+cd backend
+npm install
+
+# 3. Environment is pre-configured (.env exists)
+
+# 4. Start development server
+npm run dev
+
+# 5. Test the API
+curl http://localhost:5001/api/health
+```
+
+---
+
+## 🗄 Install MongoDB
+
+### Option A: Local Installation
+
+<details>
+<summary><strong>macOS</strong></summary>
+
 ```bash
 brew tap mongodb/brew
 brew install mongodb-community
 brew services start mongodb-community
 ```
 
-**Ubuntu/Debian:**
+Verify installation:
+```bash
+brew services list | grep mongodb
+```
+
+</details>
+
+<details>
+<summary><strong>Ubuntu/Debian</strong></summary>
+
 ```bash
 sudo apt-get install mongodb
 sudo systemctl start mongod
 sudo systemctl enable mongod
 ```
 
-**Windows:**
-Download and install from [MongoDB Download Center](https://www.mongodb.com/try/download/community)
+Verify installation:
+```bash
+sudo systemctl status mongod
+```
 
-**Option B: MongoDB Atlas (Cloud - Free Tier)**
-1. Sign up at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a free cluster
-3. Get your connection string (looks like: `mongodb+srv://username:password@cluster.mongodb.net/empirestatewalkers`)
-4. Use this in your `.env` file
+</details>
 
-### 2. Install Backend Dependencies
+<details>
+<summary><strong>Windows</strong></summary>
+
+1. Download installer from [MongoDB Download Center](https://www.mongodb.com/try/download/community)
+2. Run installer and follow setup wizard
+3. MongoDB runs as a Windows service automatically
+
+Verify installation:
+```cmd
+net start MongoDB
+```
+
+</details>
+
+### Option B: MongoDB Atlas (Cloud - Free Tier)
+
+Perfect for development and production:
+
+1. **Sign up** at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. **Create a free cluster** (M0 Sandbox - Free Forever)
+3. **Get your connection string**:
+   ```
+   mongodb+srv://username:password@cluster.mongodb.net/empirestatewalkers
+   ```
+4. **Update `.env`** with your Atlas connection string
+
+**Benefits:**
+- ✅ No local installation required
+- ✅ Free tier includes 512MB storage
+- ✅ Automatic backups
+- ✅ Production-ready infrastructure
+- ✅ Built-in monitoring
+
+---
+
+## 📦 Install Backend Dependencies
+
+Navigate to the backend directory and install all required packages:
 
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Configure Environment Variables
+**Installed packages include:**
+- express - Web framework
+- mongoose - MongoDB ODM
+- jsonwebtoken - JWT authentication
+- bcryptjs - Password hashing
+- express-validator - Input validation
+- express-rate-limit - Rate limiting
+- helmet - Security headers
+- winston - Logging
+- morgan - HTTP request logging
+- cors - CORS middleware
+- csrf-sync - CSRF protection
 
-The `.env` file is already created with development defaults. For production or MongoDB Atlas, update:
+---
+
+## ⚙️ Configure Environment Variables
+
+The `.env` file is already created with development defaults. For production or MongoDB Atlas, update as needed:
 
 ```env
-PORT=5000
+# Server Configuration
+PORT=5001
+NODE_ENV=development
+
+# Database Configuration
 MONGODB_URI=mongodb://localhost:27017/empirestatewalkers
 # OR for MongoDB Atlas:
 # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/empirestatewalkers
 
-# SECURITY: Generate a strong JWT secret using: openssl rand -base64 32
-# NEVER use the example below in production - generate your own!
+# JWT Configuration
 JWT_SECRET=REPLACE_WITH_SECURE_RANDOM_STRING_USE_OPENSSL_RAND_BASE64_32
 JWT_EXPIRE=30d
-NODE_ENV=development
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:8080
 ```
 
-**⚠️ IMPORTANT SECURITY NOTE:**
-Before deploying to production, you MUST generate a cryptographically secure JWT secret:
+### 🔐 Security: Generate Strong JWT Secret
+
+**⚠️ CRITICAL:** Before deploying to production, generate a cryptographically secure JWT secret:
 
 ```bash
-# Generate a secure JWT secret (Linux/macOS)
+# Option 1: Using OpenSSL (Recommended)
 openssl rand -base64 32
 
-# Or using Node.js
+# Option 2: Using Node.js
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+
+# Example output:
+# XyZ123AbC456DeF789GhI012JkL345MnO678PqR901StU234VwX=
 ```
 
-Copy the generated string and use it as your `JWT_SECRET` in production.
+**Copy the generated string** and replace `JWT_SECRET` in your `.env` file.
 
-### 4. Start the Backend Server
+**Why this matters:**
+- Weak secrets can be brute-forced
+- Production requires 256+ bits of entropy
+- Never reuse example secrets from documentation
 
-**Development mode (with auto-reload):**
+---
+
+## 🏃 Start the Backend Server
+
+### Development Mode (with auto-reload)
+
+Perfect for development with nodemon:
+
 ```bash
 npm run dev
 ```
 
-**Production mode:**
+**Features:**
+- Auto-restarts on file changes
+- Detailed error messages
+- Debug logging enabled
+- CORS configured for localhost
+
+### Production Mode
+
+Optimized for production deployment:
+
 ```bash
 npm start
 ```
 
-You should see:
+**Features:**
+- Optimized performance
+- Production logging
+- HTTPS enforcement
+- Security headers enabled
+
+### Expected Output
+
 ```
-MongoDB Connected: localhost
-Server running in development mode on port 5000
+🗄️  MongoDB Connected: localhost
+🚀 Server running in development mode on port 5001
+📝 Logging enabled with Winston
+🛡️  Security features active
 ```
 
-### 5. Test the API
+---
 
-Visit: http://localhost:5000/api/health
+## ✅ Test the API
 
-You should see:
+### Health Check
+
+Verify the API is running:
+
+```bash
+curl http://localhost:5001/api/health
+```
+
+**Expected response:**
 ```json
 {
   "success": true,
   "message": "Empire State Walkers API is running",
-  "timestamp": "2025-01-01T00:00:00.000Z"
+  "timestamp": "2025-11-11T00:00:00.000Z"
 }
 ```
 
-## Using the Frontend with Backend
+### Test All Endpoints
 
-### Option 1: Replace script.js (Recommended)
+| Endpoint | Method | Purpose | Auth Required |
+|----------|--------|---------|---------------|
+| `/api/health` | GET | Health check | No |
+| `/api/auth/register` | POST | Register user | No |
+| `/api/auth/login` | POST | Login user | No |
+| `/api/auth/me` | GET | Get current user | Yes |
+| `/api/bookings` | GET | Get user bookings | Yes |
+| `/api/contact` | POST | Submit contact | No |
+
+---
+
+## 🎨 Using the Frontend with Backend
+
+### Option 1: Use Existing Configuration (Recommended)
+
+The frontend is already configured to use the backend API. Just start both servers:
 
 ```bash
-# Backup original
-mv script.js script-original.js
+# Terminal 1: Backend (port 5001)
+cd backend
+npm run dev
 
-# Use API-enabled version
-mv frontend-api.js script.js
+# Terminal 2: Frontend (port 8080)
+cd ..
+python3 -m http.server 8080
 ```
 
-### Option 2: Update index.html
+### Option 2: Update API URL
 
-Change the script tag in `index.html`:
-```html
-<!-- Old -->
-<script src="script.js"></script>
+If you need to change the backend URL, update `frontend-api.js`:
 
-<!-- New -->
-<script src="frontend-api.js"></script>
+```javascript
+// Change this line if using different port/host
+const API_URL = 'http://localhost:5001';
 ```
 
 ### Start Frontend
 
+Choose your preferred method:
+
 ```bash
-# From the root directory
-python -m http.server 3000
-# OR
-npx http-server -p 3000
+# From project root directory
+
+# Option A: Python (most common)
+python3 -m http.server 8080
+
+# Option B: Node.js http-server
+npx http-server -p 8080
+
+# Option C: PHP
+php -S localhost:8080
 ```
 
-Visit: http://localhost:3000
+**Access application:** http://localhost:8080
 
-## Testing the Full Stack
+---
 
-1. **Register a new account**
-   - Click "Login" button
-   - Click "Register"
-   - Fill in details and submit
+## 🧪 Testing the Full Stack
 
-2. **Login**
-   - Use your email and password
-   - You'll be redirected to dashboard
+### 1. Register a New Account
 
-3. **Submit a contact form**
-   - Go to Contact section
-   - Fill and submit
+1. Navigate to http://localhost:8080
+2. Click **"Login"** button in navigation
+3. Click **"Register"** tab
+4. Fill in registration form:
+   - **Name:** Your Name
+   - **Email:** your@email.com
+   - **Phone:** 555-1234
+   - **Password:** Password123 (8+ chars, uppercase, lowercase, number)
+5. Click **"Register"**
+6. You'll be automatically logged in and redirected to dashboard
 
-4. **Create a booking** (requires booking form in frontend)
+### 2. Login
 
-## Troubleshooting
+1. Click **"Login"** button
+2. Enter your **email** and **password**
+3. Click **"Login"**
+4. Redirected to personalized dashboard
+
+### 3. Submit Contact Form
+
+1. Go to **Contact** section
+2. Fill in your details:
+   - Name, email, phone, message
+3. Click **"Send Message"**
+4. See success confirmation
+
+### 4. Create a Booking
+
+1. From your dashboard, click **"Book a Service"**
+2. Fill in booking details:
+   - Dog name and breed
+   - Service type
+   - Date and time
+   - Special instructions
+3. Submit booking
+4. View booking in your dashboard
+
+---
+
+## 🔧 Troubleshooting
 
 ### MongoDB Connection Error
 
-**Error:** `MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017`
+**Error:**
+```
+MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017
+```
 
 **Solution:**
+
 ```bash
 # Check if MongoDB is running
 # macOS
-brew services list
+brew services list | grep mongodb
 
 # Linux
 sudo systemctl status mongod
@@ -171,135 +383,392 @@ brew services start mongodb-community
 
 # Linux
 sudo systemctl start mongod
+
+# Windows
+net start MongoDB
 ```
+
+**Still not working?**
+- Check MongoDB is installed: `mongod --version`
+- Check logs: `/usr/local/var/log/mongodb/` (macOS)
+- Try connecting with MongoDB Compass: `mongodb://localhost:27017`
+
+---
 
 ### CORS Error
 
-**Error:** `Access to fetch at 'http://localhost:5000/api/...' from origin 'http://localhost:3000' has been blocked by CORS`
+**Error:**
+```
+Access to fetch at 'http://localhost:5001/api/...' from origin 'http://localhost:8080'
+has been blocked by CORS policy
+```
 
-**Solution:** The backend CORS is configured to allow `http://localhost:3000`. Make sure:
-1. Frontend runs on port 3000
-2. Backend CORS config in `server.js` includes your frontend URL
+**Solution:**
+
+The backend CORS is configured for `http://localhost:8080`. Ensure:
+
+1. **Frontend runs on port 8080** (not 3000, 5000, etc.)
+2. **Backend `.env` has correct CORS_ORIGIN:**
+   ```env
+   CORS_ORIGIN=http://localhost:8080
+   ```
+3. **Restart backend server** after changing `.env`
+
+**Multiple frontend ports?** Update `server.js`:
+```javascript
+const allowedOrigins = [
+  'http://localhost:8080',
+  'http://localhost:3000',
+  'http://127.0.0.1:8080'
+];
+```
+
+---
 
 ### Port Already in Use
 
-**Error:** `Error: listen EADDRINUSE: address already in use :::5000`
+**Error:**
+```
+Error: listen EADDRINUSE: address already in use :::5001
+```
 
 **Solution:**
-```bash
-# Find and kill process on port 5000
-# macOS/Linux
-lsof -ti:5000 | xargs kill -9
 
-# Windows
-netstat -ano | findstr :5000
+```bash
+# Find process using port 5001
+
+# macOS/Linux
+lsof -ti:5001 | xargs kill -9
+
+# Or find the process first
+lsof -i:5001
+
+# Windows (PowerShell)
+Get-Process -Id (Get-NetTCPConnection -LocalPort 5001).OwningProcess | Stop-Process
+
+# Windows (CMD)
+netstat -ano | findstr :5001
 taskkill /PID <PID> /F
 ```
 
-## API Testing with cURL
+**Alternative:** Change port in `.env`:
+```env
+PORT=5002
+```
 
-### Register
+---
+
+### Authentication Issues
+
+**Problem:** Can't login or token errors
+
+**Solutions:**
+
+1. **Clear browser storage:**
+   ```javascript
+   // In browser console (F12)
+   localStorage.clear();
+   sessionStorage.clear();
+   ```
+
+2. **Verify JWT_SECRET is set:**
+   ```bash
+   grep JWT_SECRET backend/.env
+   ```
+
+3. **Check password requirements:**
+   - Minimum 8 characters
+   - At least 1 uppercase letter
+   - At least 1 lowercase letter
+   - At least 1 number
+
+4. **Rate limiting:** If you see "Too many requests", wait 15 minutes
+
+---
+
+## 🧰 API Testing with cURL
+
+### Register New User
+
 ```bash
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST http://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test User",
     "email": "test@example.com",
     "phone": "555-1234",
-    "password": "password123"
+    "password": "Password123"
   }'
 ```
 
 ### Login
+
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
+  -c cookies.txt \
   -d '{
     "email": "test@example.com",
-    "password": "password123"
+    "password": "Password123"
   }'
 ```
 
-Save the token from the response, then:
+### Get User Info (with cookies)
 
-### Get User Info
 ```bash
-curl http://localhost:5000/api/auth/me \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+curl http://localhost:5001/api/auth/me \
+  -b cookies.txt
 ```
 
-### Create Booking
+### Create Booking (with cookies)
+
 ```bash
-curl -X POST http://localhost:5000/api/bookings \
+curl -X POST http://localhost:5001/api/bookings \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -b cookies.txt \
   -d '{
     "dogName": "Max",
     "dogBreed": "Golden Retriever",
     "service": "Daily Walk (30 min)",
-    "date": "2025-01-15",
+    "date": "2025-12-15",
     "time": "10:00 AM",
     "duration": "30 min",
     "specialInstructions": "Loves treats!"
   }'
 ```
 
-## Development Tips
+### Get User's Bookings
+
+```bash
+curl http://localhost:5001/api/bookings \
+  -b cookies.txt
+```
+
+### Submit Contact Form
+
+```bash
+curl -X POST http://localhost:5001/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "phone": "555-9876",
+    "message": "I would like to book a walk for my dog!"
+  }'
+```
+
+---
+
+## 💻 Development Tips
 
 ### View Database in MongoDB Compass
 
-1. Download [MongoDB Compass](https://www.mongodb.com/products/compass)
-2. Connect to: `mongodb://localhost:27017`
-3. Select `empirestatewalkers` database
-4. Browse collections: `users`, `bookings`, `contacts`
+**MongoDB Compass** provides a visual interface for your database:
+
+1. **Download** [MongoDB Compass](https://www.mongodb.com/products/compass)
+2. **Connect to:** `mongodb://localhost:27017`
+3. **Select database:** `empirestatewalkers`
+4. **Browse collections:**
+   - `users` - All registered users
+   - `bookings` - All bookings
+   - `contacts` - Contact form submissions
+
+**Useful features:**
+- Visual query builder
+- Index management
+- Schema analysis
+- Performance insights
+
+---
+
+### View Database with mongosh (CLI)
+
+```bash
+# Connect to database
+mongosh mongodb://localhost:27017/empirestatewalkers
+
+# View collections
+show collections
+
+# View all users (pretty formatted)
+db.users.find().pretty()
+
+# Count documents
+db.users.countDocuments()
+db.bookings.countDocuments()
+
+# Find specific user
+db.users.findOne({ email: "test@example.com" })
+
+# Find pending bookings
+db.bookings.find({ status: "pending" })
+
+# Exit
+exit
+```
+
+---
 
 ### Reset Database
 
+**Warning:** This deletes all data!
+
 ```bash
 # Connect to MongoDB shell
-mongosh
-
-# Use database
-use empirestatewalkers
+mongosh mongodb://localhost:27017/empirestatewalkers
 
 # Drop all collections
 db.users.drop()
 db.bookings.drop()
 db.contacts.drop()
+
+# Or drop entire database
+db.dropDatabase()
 ```
+
+---
 
 ### Create Admin User
 
-Currently, all users are created as regular users. To create an admin:
+By default, all users are created as regular users. To create an admin:
 
-1. Register normally through the API
-2. Connect to MongoDB and update:
+**Method 1: Update existing user via mongosh**
 
 ```bash
-mongosh
-use empirestatewalkers
+mongosh mongodb://localhost:27017/empirestatewalkers
+
 db.users.updateOne(
   { email: "admin@example.com" },
   { $set: { role: "admin" } }
 )
 ```
 
-## Production Deployment
+**Method 2: Quick one-liner**
 
-See `backend/README.md` for detailed deployment instructions.
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers \
+  --eval 'db.users.updateOne({email: "admin@example.com"}, {$set: {role: "admin"}})'
+```
 
-Quick checklist:
-- [ ] Use MongoDB Atlas or managed MongoDB
-- [ ] Update `JWT_SECRET` to a strong random string
-- [ ] Set `NODE_ENV=production`
-- [ ] Update CORS origin to your production domain
-- [ ] Use HTTPS
-- [ ] Set up environment variables on hosting platform
-- [ ] Enable security features (rate limiting, helmet, etc.)
+**Verify admin status:**
 
-## Need Help?
+```bash
+mongosh mongodb://localhost:27017/empirestatewalkers \
+  --eval 'db.users.find({role: "admin"}).pretty()'
+```
 
-- Backend API docs: See `backend/README.md`
-- MongoDB docs: https://docs.mongodb.com/
-- Express docs: https://expressjs.com/
-- Mongoose docs: https://mongoosejs.com/
+---
+
+### View Application Logs
+
+Logs are stored in `backend/logs/`:
+
+```bash
+# View all logs
+tail -f backend/logs/all.log
+
+# View only errors
+tail -f backend/logs/error.log
+
+# Search for specific event
+grep "login" backend/logs/all.log
+
+# View last 50 lines
+tail -n 50 backend/logs/all.log
+```
+
+---
+
+## 🚢 Production Deployment
+
+### Pre-Deployment Checklist
+
+Before deploying to production:
+
+- [ ] **MongoDB:** Use MongoDB Atlas or managed MongoDB service
+- [ ] **JWT_SECRET:** Generate strong random string (32+ bytes)
+- [ ] **NODE_ENV:** Set to `production`
+- [ ] **CORS_ORIGIN:** Update to your production frontend URL
+- [ ] **HTTPS:** Ensure SSL/TLS certificate is configured
+- [ ] **Environment Variables:** Set on hosting platform
+- [ ] **Security Features:** Verify helmet, rate limiting, CSRF enabled
+- [ ] **Logging:** Configure log rotation and monitoring
+- [ ] **Database Backups:** Enable automated backups
+- [ ] **Error Tracking:** Set up error monitoring (Sentry, etc.)
+
+### Recommended Hosting Platforms
+
+| Platform | Best For | Free Tier | MongoDB Support |
+|----------|----------|-----------|-----------------|
+| **Railway** | Modern apps | Limited | ✅ Built-in |
+| **Render** | Easy deployment | Yes | ✅ Via Atlas |
+| **Heroku** | Quick setup | Limited | ✅ Via Atlas |
+| **DigitalOcean** | Full control | No | ✅ Managed DB |
+| **AWS/GCP/Azure** | Enterprise | Limited | ✅ Full service |
+
+### Production Environment Variables
+
+```env
+NODE_ENV=production
+PORT=5001
+MONGODB_URI=mongodb+srv://user:pass@production-cluster.mongodb.net/empirestatewalkers
+JWT_SECRET=YOUR_PRODUCTION_SECRET_FROM_OPENSSL_RAND
+JWT_EXPIRE=30d
+CORS_ORIGIN=https://yourdomain.com
+```
+
+### Quick Deploy to Railway
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login
+railway login
+
+# Initialize project
+railway init
+
+# Add environment variables
+railway variables set NODE_ENV=production
+railway variables set MONGODB_URI=your_atlas_uri
+railway variables set JWT_SECRET=your_secure_secret
+
+# Deploy
+railway up
+```
+
+---
+
+## 📚 Additional Resources
+
+- **Backend API Documentation:** [backend/README.md](backend/README.md)
+- **Main Project README:** [README.md](../README.md)
+- **Security Assessment:** [security_assessment.md](../security_assessment.md)
+- **MongoDB Documentation:** [docs.mongodb.com](https://docs.mongodb.com/)
+- **Express.js Guide:** [expressjs.com](https://expressjs.com/)
+- **Mongoose ODM:** [mongoosejs.com](https://mongoosejs.com/)
+
+---
+
+## 🆘 Need Help?
+
+If you encounter issues not covered in this guide:
+
+1. **Check logs:** `backend/logs/error.log` and `backend/logs/all.log`
+2. **Verify environment:** All required variables in `.env`
+3. **Test database:** Connect with MongoDB Compass
+4. **Review documentation:** See links above
+5. **Create an issue:** [GitHub Issues](https://github.com/Rubelefsky/empirestatewalkers/issues)
+
+---
+
+<div align="center">
+
+**🚀 Happy coding!**
+
+Built with Node.js, Express, and MongoDB
+
+[⬆ Back to Top](#-backend-setup-guide)
+
+</div>
