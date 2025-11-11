@@ -411,25 +411,59 @@ class EmpireStateWalkers {
         const bookingsList = document.getElementById('bookings-list');
         if (!bookingsList) return;
 
+        // Clear existing content
+        bookingsList.innerHTML = '';
+
         if (bookings.length === 0) {
-            bookingsList.innerHTML = '<p class="empty-state">No bookings yet</p>';
+            const emptyState = document.createElement('p');
+            emptyState.className = 'empty-state';
+            emptyState.textContent = 'No bookings yet';
+            bookingsList.appendChild(emptyState);
             return;
         }
 
-        bookingsList.innerHTML = bookings.map(booking => `
-            <div style="border: 1px solid #000; padding: 16px; margin-bottom: 16px;">
-                <div style="margin-bottom: 8px;">
-                    <strong>${booking.dogName}</strong>
-                    <span style="color: #808080;"> — ${booking.service}</span>
-                </div>
-                <div style="font-size: 14px; color: #808080;">
-                    ${new Date(booking.date).toLocaleDateString()} at ${booking.time}
-                </div>
-                <div style="font-size: 14px; margin-top: 4px;">
-                    Status: <span style="text-transform: capitalize;">${booking.status}</span>
-                </div>
-            </div>
-        `).join('');
+        // Create booking elements using DOM manipulation to prevent XSS
+        bookings.forEach(booking => {
+            const bookingDiv = document.createElement('div');
+            bookingDiv.style.cssText = 'border: 1px solid #000; padding: 16px; margin-bottom: 16px;';
+
+            // Dog name and service row
+            const headerDiv = document.createElement('div');
+            headerDiv.style.marginBottom = '8px';
+
+            const dogNameStrong = document.createElement('strong');
+            dogNameStrong.textContent = booking.dogName; // Safe: textContent auto-escapes
+
+            const serviceSpan = document.createElement('span');
+            serviceSpan.style.color = '#808080';
+            serviceSpan.textContent = ' — ' + booking.service; // Safe: textContent auto-escapes
+
+            headerDiv.appendChild(dogNameStrong);
+            headerDiv.appendChild(serviceSpan);
+
+            // Date and time row
+            const dateDiv = document.createElement('div');
+            dateDiv.style.cssText = 'font-size: 14px; color: #808080;';
+            dateDiv.textContent = new Date(booking.date).toLocaleDateString() + ' at ' + booking.time;
+
+            // Status row
+            const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = 'font-size: 14px; margin-top: 4px;';
+
+            const statusLabel = document.createTextNode('Status: ');
+            const statusSpan = document.createElement('span');
+            statusSpan.style.textTransform = 'capitalize';
+            statusSpan.textContent = booking.status; // Safe: textContent auto-escapes
+
+            statusDiv.appendChild(statusLabel);
+            statusDiv.appendChild(statusSpan);
+
+            // Append all elements
+            bookingDiv.appendChild(headerDiv);
+            bookingDiv.appendChild(dateDiv);
+            bookingDiv.appendChild(statusDiv);
+            bookingsList.appendChild(bookingDiv);
+        });
     }
 }
 

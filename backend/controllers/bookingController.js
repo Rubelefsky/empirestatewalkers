@@ -108,9 +108,29 @@ exports.updateBooking = async (req, res) => {
             });
         }
 
+        // Whitelist allowed fields to prevent mass assignment vulnerability
+        const allowedFields = ['service', 'date', 'time', 'dogName', 'dogBreed', 'specialInstructions', 'duration'];
+        const updateData = {};
+
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                updateData[field] = req.body[field];
+            }
+        });
+
+        // Only admins can update status and price
+        if (req.user.role === 'admin') {
+            if (req.body.status !== undefined) {
+                updateData.status = req.body.status;
+            }
+            if (req.body.price !== undefined) {
+                updateData.price = req.body.price;
+            }
+        }
+
         const updatedBooking = await Booking.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateData,
             { new: true, runValidators: true }
         );
 
