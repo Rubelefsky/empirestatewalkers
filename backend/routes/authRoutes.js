@@ -3,7 +3,8 @@ const {
     register,
     login,
     getMe,
-    updateDetails
+    updateDetails,
+    logout
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const {
@@ -16,6 +17,7 @@ const router = express.Router();
 
 router.post('/register', registerValidation, register);
 router.post('/login', loginValidation, login);
+router.get('/logout', protect, logout);
 router.get('/me', protect, getMe);
 router.put('/updatedetails', protect, updateDetailsValidation, updateDetails);
 

@@ -6,7 +6,6 @@ const API_URL = 'http://localhost:5001/api';
 class EmpireStateWalkers {
     constructor() {
         this.currentUser = null;
-        this.token = null;
         this.init();
     }
 
@@ -28,11 +27,9 @@ class EmpireStateWalkers {
     }
 
     checkAuthState() {
-        const token = localStorage.getItem('token');
         const user = localStorage.getItem('currentUser');
 
-        if (token && user) {
-            this.token = token;
+        if (user) {
             this.currentUser = JSON.parse(user);
             this.validateToken();
         }
@@ -41,9 +38,7 @@ class EmpireStateWalkers {
     async validateToken() {
         try {
             const response = await fetch(`${API_URL}/auth/me`, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`
-                }
+                credentials: 'include' // Send cookies with request
             });
 
             if (!response.ok) {
@@ -61,7 +56,7 @@ class EmpireStateWalkers {
     }
 
     updateUIBasedOnAuth() {
-        const isLoggedIn = this.currentUser !== null && this.token !== null;
+        const isLoggedIn = this.currentUser !== null;
 
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
@@ -181,6 +176,7 @@ class EmpireStateWalkers {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({ name, email, phone, message })
             });
 
@@ -238,6 +234,7 @@ class EmpireStateWalkers {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include', // Send and receive cookies
                 body: JSON.stringify({ email, password })
             });
 
@@ -245,9 +242,7 @@ class EmpireStateWalkers {
 
             if (data.success) {
                 this.currentUser = data.data;
-                this.token = data.data.token;
                 localStorage.setItem('currentUser', JSON.stringify(data.data));
-                localStorage.setItem('token', this.token);
 
                 this.hideLoginModal();
                 alert('Login successful!');
@@ -290,6 +285,7 @@ class EmpireStateWalkers {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include', // Send and receive cookies
                 body: JSON.stringify({ name, email, phone, password })
             });
 
@@ -297,9 +293,7 @@ class EmpireStateWalkers {
 
             if (data.success) {
                 this.currentUser = data.data;
-                this.token = data.data.token;
                 localStorage.setItem('currentUser', JSON.stringify(data.data));
-                localStorage.setItem('token', this.token);
 
                 this.hideRegisterModal();
                 alert('Account created successfully!');
@@ -319,11 +313,20 @@ class EmpireStateWalkers {
         }
     }
 
-    handleLogout() {
+    async handleLogout() {
+        try {
+            // Call logout endpoint to clear cookie
+            await fetch(`${API_URL}/auth/logout`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+
+        // Clear local state
         this.currentUser = null;
-        this.token = null;
         localStorage.removeItem('currentUser');
-        localStorage.removeItem('token');
         this.updateUIBasedOnAuth();
         alert('Logged out successfully.');
         window.location.hash = '#home';
@@ -379,13 +382,11 @@ class EmpireStateWalkers {
     }
 
     async fetchAndRenderBookings() {
-        if (!this.token) return;
+        if (!this.currentUser) return;
 
         try {
             const response = await fetch(`${API_URL}/bookings`, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`
-                }
+                credentials: 'include' // Send cookies with request
             });
 
             const data = await response.json();

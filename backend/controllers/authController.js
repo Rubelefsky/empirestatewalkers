@@ -2,20 +2,36 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
 // Helper to create user response object
-const createUserResponse = (user, token = null) => {
-    const response = {
+const createUserResponse = (user) => {
+    return {
         id: user._id,
         name: user.name,
         email: user.email,
         phone: user.phone,
+        role: user.role,
         memberSince: user.memberSince
     };
+};
 
-    if (token) {
-        response.token = token;
-    }
+// Helper to send token via httpOnly cookie
+const sendTokenResponse = (user, statusCode, res) => {
+    const token = generateToken(user._id);
 
-    return response;
+    // Cookie options
+    const cookieOptions = {
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        httpOnly: true, // Prevents XSS attacks
+        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+        sameSite: 'strict', // CSRF protection
+        path: '/'
+    };
+
+    res.status(statusCode)
+        .cookie('token', token, cookieOptions)
+        .json({
+            success: true,
+            data: createUserResponse(user)
+        });
 };
 
 // @desc    Register new user
@@ -27,19 +43,15 @@ exports.register = async (req, res) => {
 
         const userExists = await User.findOne({ email });
         if (userExists) {
+            // Generic message to prevent user enumeration attack
             return res.status(400).json({
                 success: false,
-                message: 'User already exists with this email'
+                message: 'Registration failed. Please check your details and try again.'
             });
         }
 
         const user = await User.create({ name, email, phone, password });
-        const token = generateToken(user._id);
-
-        res.status(201).json({
-            success: true,
-            data: createUserResponse(user, token)
-        });
+        sendTokenResponse(user, 201, res);
     } catch (error) {
         console.error('Register error:', error);
         res.status(500).json({
@@ -71,12 +83,7 @@ exports.login = async (req, res) => {
             });
         }
 
-        const token = generateToken(user._id);
-
-        res.json({
-            success: true,
-            data: createUserResponse(user, token)
-        });
+        sendTokenResponse(user, 200, res);
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({
@@ -129,6 +136,32 @@ exports.updateDetails = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to update profile'
+        });
+    }
+};
+
+// @desc    Logout user / clear cookie
+// @route   GET /api/auth/logout
+// @access  Private
+exports.logout = async (req, res) => {
+    try {
+        res.cookie('token', 'none', {
+            expires: new Date(Date.now() + 1 * 1000), // Expire in 1 second
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
+
+        res.json({
+            success: true,
+            message: 'Logged out successfully'
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Logout failed'
         });
     }
 };
