@@ -200,7 +200,7 @@ empirestatewalkers/
 
 ## 👤 Admin User Credentials
 
-**Email:** brubell2@gmail.com
+**Email:** b*****@gmail.com
 **Role:** admin
 **Member Since:** November 10, 2025
 
