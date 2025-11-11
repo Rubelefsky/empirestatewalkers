@@ -80,8 +80,10 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
     : [
         'http://localhost:3000',
         'http://localhost:5000',
+        'http://localhost:8000',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5000',
+        'http://127.0.0.1:8000',
         // Add your local development URLs here
     ];
 
@@ -116,10 +118,23 @@ const { csrfSynchronisedProtection } = csrfSync({
     ignoredMethods: ['GET', 'HEAD', 'OPTIONS'], // Don't require CSRF for safe methods
 });
 
-// Apply CSRF protection to all routes except health check
+// Apply CSRF protection to all routes except health check and auth endpoints
 app.use((req, res, next) => {
-    // Skip CSRF for health check
-    if (req.path === '/api/health') {
+    // Disable CSRF in development mode for easier testing
+    // In production, implement proper CSRF token handling in frontend
+    if (process.env.NODE_ENV === 'development') {
+        return next();
+    }
+
+    // Skip CSRF for health check and auth endpoints (login/register)
+    const skipCsrfPaths = [
+        '/api/health',
+        '/api/auth/login',
+        '/api/auth/register',
+        '/api/contact' // Public contact form
+    ];
+
+    if (skipCsrfPaths.includes(req.path)) {
         return next();
     }
     csrfSynchronisedProtection(req, res, next);

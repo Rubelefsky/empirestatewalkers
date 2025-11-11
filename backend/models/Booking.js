@@ -29,9 +29,19 @@ const bookingSchema = new mongoose.Schema({
         required: [true, 'Please provide a time']
     },
     duration: {
+        type: Number,
+        required: [true, 'Please provide duration in minutes'],
+        min: [15, 'Duration must be at least 15 minutes'],
+        max: [480, 'Duration cannot exceed 480 minutes (8 hours)']
+    },
+    dogAge: {
+        type: Number,
+        min: [0, 'Age cannot be negative'],
+        max: [30, 'Please enter a valid age']
+    },
+    notes: {
         type: String,
-        enum: ['30 min', '60 min', 'Full day'],
-        default: '30 min'
+        trim: true
     },
     specialInstructions: {
         type: String,
