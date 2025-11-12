@@ -19,6 +19,17 @@ connectDB();
 
 const app = express();
 
+// Stripe webhook route - Must come BEFORE body parser middleware
+// Stripe webhooks require raw body for signature verification
+const paymentRoutes = require('./routes/paymentRoutes');
+app.use('/api/payments/webhook',
+    express.raw({ type: 'application/json' }),
+    (req, res, next) => {
+        // Forward to the webhook handler
+        require('./controllers/paymentController').handleWebhook(req, res, next);
+    }
+);
+
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -131,7 +142,8 @@ app.use((req, res, next) => {
         '/api/health',
         '/api/auth/login',
         '/api/auth/register',
-        '/api/contact' // Public contact form
+        '/api/contact', // Public contact form
+        '/api/payments/webhook' // Stripe webhook
     ];
 
     if (skipCsrfPaths.includes(req.path)) {
@@ -184,6 +196,7 @@ const contactLimiter = rateLimit({
 const authRoutes = require('./routes/authRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+// paymentRoutes already imported above for webhook handling
 
 // Cache control and security headers middleware
 app.use((req, res, next) => {
@@ -202,6 +215,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/contact', contactLimiter, contactRoutes);
+app.use('/api/payments', paymentRoutes); // Webhook already mounted above
 
 // Health check route
 app.get('/api/health', (req, res) => {
@@ -235,6 +249,7 @@ const server = app.listen(PORT, () => {
     logger.info('  - CORS protection');
     logger.info('  - Request logging');
     logger.info('  - HttpOnly cookie authentication');
+    logger.info('  - Stripe payment processing with webhook verification');
 });
 
 // Handle unhandled promise rejections

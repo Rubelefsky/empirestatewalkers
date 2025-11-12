@@ -6,6 +6,10 @@ const API_URL = 'http://localhost:5001/api';
 class EmpireStateWalkers {
     constructor() {
         this.currentUser = null;
+        this.stripe = null;
+        this.elements = null;
+        this.paymentElement = null;
+        this.currentBookingId = null;
         this.init();
     }
 
@@ -13,6 +17,26 @@ class EmpireStateWalkers {
         this.checkAuthState();
         this.setupEventListeners();
         this.updateUIBasedOnAuth();
+        this.initializeStripe();
+    }
+
+    initializeStripe() {
+        // Initialize Stripe with your publishable key
+        // IMPORTANT: Replace with your actual Stripe publishable key
+        // This should be loaded from environment variables in production
+        const stripePublishableKey = 'pk_test_YOUR_PUBLISHABLE_KEY';
+
+        // Only initialize if Stripe is loaded
+        if (typeof Stripe !== 'undefined') {
+            try {
+                this.stripe = Stripe(stripePublishableKey);
+                console.log('Stripe initialized successfully');
+            } catch (error) {
+                console.error('Error initializing Stripe:', error);
+            }
+        } else {
+            console.warn('Stripe.js not loaded');
+        }
     }
 
     setupEventListeners() {
@@ -60,6 +84,17 @@ class EmpireStateWalkers {
                     this.hideBookingModal();
                 }
             });
+        }
+
+        // Payment event listeners
+        const submitPaymentBtn = document.getElementById('submit-payment');
+        if (submitPaymentBtn) {
+            submitPaymentBtn.addEventListener('click', (e) => this.handlePaymentSubmit(e));
+        }
+
+        const cancelPaymentBtn = document.getElementById('cancel-payment-btn');
+        if (cancelPaymentBtn) {
+            cancelPaymentBtn.addEventListener('click', () => this.hideBookingModal());
         }
     }
 
@@ -480,6 +515,14 @@ class EmpireStateWalkers {
             statusSpan.className = `booking-status ${booking.status}`;
             statusSpan.textContent = booking.status;
 
+            // Add payment status badge if available
+            if (booking.paymentStatus) {
+                const paymentStatusSpan = document.createElement('span');
+                paymentStatusSpan.className = `booking-status payment-${booking.paymentStatus}`;
+                paymentStatusSpan.textContent = booking.paymentStatus === 'succeeded' ? 'Paid' : booking.paymentStatus;
+                headerDiv.appendChild(paymentStatusSpan);
+            }
+
             headerDiv.appendChild(titleDiv);
             headerDiv.appendChild(statusSpan);
 
@@ -614,9 +657,24 @@ class EmpireStateWalkers {
             const data = await response.json();
 
             if (data.success) {
-                alert(bookingId ? 'Booking updated successfully!' : 'Booking created successfully!');
-                this.hideBookingModal();
-                await this.fetchAndRenderBookings();
+                const booking = data.data;
+
+                if (bookingId) {
+                    // Edit mode - just close and refresh
+                    alert('Booking updated successfully!');
+                    this.hideBookingModal();
+                    await this.fetchAndRenderBookings();
+                } else {
+                    // New booking - proceed to payment
+                    // Check if the service requires payment (not "Other")
+                    if (booking.service !== 'Other' && booking.price > 0) {
+                        await this.showPaymentForm(booking);
+                    } else {
+                        alert('Booking created successfully! Our team will contact you regarding payment.');
+                        this.hideBookingModal();
+                        await this.fetchAndRenderBookings();
+                    }
+                }
             } else {
                 alert('Error: ' + data.message);
             }
@@ -648,6 +706,210 @@ class EmpireStateWalkers {
         } catch (error) {
             console.error('Error cancelling booking:', error);
             alert('Error cancelling booking. Please try again.');
+        }
+    }
+
+    /**
+     * Payment Methods
+     */
+
+    async showPaymentForm(booking) {
+        if (!this.stripe) {
+            alert('Payment system is not available. Please contact support.');
+            return;
+        }
+
+        try {
+            // Store current booking ID
+            this.currentBookingId = booking._id;
+
+            // Update modal title
+            const modalTitle = document.getElementById('booking-modal-title');
+            if (modalTitle) {
+                modalTitle.textContent = 'Complete Payment';
+            }
+
+            // Hide booking form, show payment section
+            const bookingFormSection = document.getElementById('booking-form-section');
+            const paymentSection = document.getElementById('payment-section');
+
+            if (bookingFormSection) bookingFormSection.classList.add('hidden');
+            if (paymentSection) paymentSection.classList.remove('hidden');
+
+            // Update payment summary
+            document.getElementById('payment-service').textContent = booking.service;
+            const bookingDate = new Date(booking.date);
+            document.getElementById('payment-datetime').textContent =
+                `${bookingDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                })} at ${booking.time}`;
+            document.getElementById('payment-amount').textContent = `$${booking.price.toFixed(2)}`;
+
+            // Create payment intent
+            const response = await fetch(`${API_URL}/payments/create-payment-intent`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ bookingId: booking._id })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to create payment intent');
+            }
+
+            const { clientSecret } = data;
+
+            // Initialize Stripe Elements
+            const appearance = {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#000000',
+                    fontFamily: 'Space Mono, monospace',
+                    borderRadius: '0px'
+                }
+            };
+
+            this.elements = this.stripe.elements({ clientSecret, appearance });
+            this.paymentElement = this.elements.create('payment');
+            this.paymentElement.mount('#payment-element');
+
+            // Handle loading state
+            this.paymentElement.on('ready', () => {
+                console.log('Payment element ready');
+            });
+
+            this.paymentElement.on('change', (event) => {
+                const displayError = document.getElementById('payment-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+
+        } catch (error) {
+            console.error('Error showing payment form:', error);
+            this.showPaymentMessage(error.message, 'error');
+        }
+    }
+
+    async handlePaymentSubmit(e) {
+        e.preventDefault();
+
+        if (!this.stripe || !this.elements) {
+            alert('Payment system is not ready. Please try again.');
+            return;
+        }
+
+        // Show loading state
+        this.setPaymentLoading(true);
+
+        try {
+            // Confirm the payment
+            const { error, paymentIntent } = await this.stripe.confirmPayment({
+                elements: this.elements,
+                confirmParams: {
+                    return_url: window.location.origin + window.location.pathname,
+                },
+                redirect: 'if_required'
+            });
+
+            if (error) {
+                // Payment failed
+                this.showPaymentMessage(error.message, 'error');
+                this.setPaymentLoading(false);
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                // Payment succeeded
+                this.showPaymentMessage('Payment successful! Your booking is confirmed.', 'success');
+
+                // Wait a moment for user to see the message
+                setTimeout(() => {
+                    this.hideBookingModal();
+                    this.fetchAndRenderBookings();
+                }, 2000);
+            } else {
+                // Payment requires additional action or is processing
+                this.showPaymentMessage('Payment is processing...', 'info');
+                this.setPaymentLoading(false);
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+            this.showPaymentMessage('An unexpected error occurred. Please try again.', 'error');
+            this.setPaymentLoading(false);
+        }
+    }
+
+    setPaymentLoading(isLoading) {
+        const submitButton = document.getElementById('submit-payment');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.getElementById('spinner');
+
+        if (submitButton) {
+            submitButton.disabled = isLoading;
+        }
+
+        if (buttonText) {
+            buttonText.textContent = isLoading ? 'Processing...' : 'Pay Now';
+        }
+
+        if (spinner) {
+            if (isLoading) {
+                spinner.classList.remove('hidden');
+            } else {
+                spinner.classList.add('hidden');
+            }
+        }
+    }
+
+    showPaymentMessage(message, type = 'info') {
+        const messageElement = document.getElementById('payment-message');
+        if (messageElement) {
+            messageElement.textContent = message;
+            messageElement.className = 'payment-message payment-message-' + type;
+
+            // Clear error message area
+            if (type === 'success') {
+                const errorElement = document.getElementById('payment-errors');
+                if (errorElement) {
+                    errorElement.textContent = '';
+                }
+            }
+        }
+    }
+
+    hideBookingModal() {
+        const modal = document.getElementById('booking-modal');
+        const bookingFormSection = document.getElementById('booking-form-section');
+        const paymentSection = document.getElementById('payment-section');
+
+        // Reset modal state
+        if (bookingFormSection) bookingFormSection.classList.remove('hidden');
+        if (paymentSection) paymentSection.classList.add('hidden');
+
+        // Clear payment element
+        if (this.paymentElement) {
+            this.paymentElement.unmount();
+            this.paymentElement = null;
+        }
+        this.elements = null;
+        this.currentBookingId = null;
+
+        // Clear messages
+        const paymentErrors = document.getElementById('payment-errors');
+        const paymentMessage = document.getElementById('payment-message');
+        if (paymentErrors) paymentErrors.textContent = '';
+        if (paymentMessage) paymentMessage.textContent = '';
+
+        // Hide modal
+        if (modal) {
+            modal.classList.add('hidden');
         }
     }
 }

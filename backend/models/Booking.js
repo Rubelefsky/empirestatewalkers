@@ -55,6 +55,31 @@ const bookingSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true
+    },
+    // Payment-related fields
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'processing', 'succeeded', 'failed', 'refunded'],
+        default: 'pending'
+    },
+    stripePaymentIntentId: {
+        type: String,
+        sparse: true // Allows multiple null values while maintaining uniqueness for non-null values
+    },
+    stripeChargeId: {
+        type: String
+    },
+    paymentMethod: {
+        type: String // e.g., 'card', 'link', etc.
+    },
+    paidAt: {
+        type: Date
+    },
+    refundedAt: {
+        type: Date
+    },
+    refundAmount: {
+        type: Number
     }
 }, {
     timestamps: true
