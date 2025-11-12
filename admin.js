@@ -257,7 +257,9 @@ class AdminDashboard {
                 { label: 'Date', value: new Date(booking.date).toLocaleDateString() },
                 { label: 'Time', value: booking.time },
                 { label: 'Duration', value: `${booking.duration} min` },
-                { label: 'Price', value: `$${booking.price || 'N/A'}` }
+                { label: 'Price', value: `$${booking.price || 'N/A'}` },
+                { label: 'Payment Status', value: booking.paymentStatus || 'pending' },
+                { label: 'Payment Method', value: booking.paymentMethod || 'N/A' }
             ];
 
             infoItems.forEach(item => {
@@ -293,6 +295,15 @@ class AdminDashboard {
 
             actionsDiv.appendChild(viewBtn);
             actionsDiv.appendChild(updateStatusBtn);
+
+            // Add refund button if payment succeeded
+            if (booking.paymentStatus === 'succeeded') {
+                const refundBtn = document.createElement('button');
+                refundBtn.className = 'btn-minimal btn-small btn-danger';
+                refundBtn.textContent = 'Issue Refund';
+                refundBtn.addEventListener('click', () => this.handleRefund(booking));
+                actionsDiv.appendChild(refundBtn);
+            }
 
             // Append all
             bookingDiv.appendChild(headerDiv);
@@ -575,6 +586,35 @@ class AdminDashboard {
         this.currentUser = null;
         localStorage.removeItem('currentUser');
         window.location.href = 'index.html';
+    }
+
+    async handleRefund(booking) {
+        if (!confirm(`Are you sure you want to issue a refund for $${booking.price}?\n\nThis action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/payments/refund/${booking._id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Refund issued successfully!');
+                await this.fetchBookings();
+                this.updateStats();
+            } else {
+                alert('Error issuing refund: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error issuing refund:', error);
+            alert('Error issuing refund. Please try again.');
+        }
     }
 }
 

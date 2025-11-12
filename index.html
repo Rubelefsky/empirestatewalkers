@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -261,54 +263,92 @@
         <div class="modal-content modal-large">
             <button id="close-booking-modal" class="modal-close">×</button>
             <h2 id="booking-modal-title">New Booking</h2>
-            <form id="booking-form">
-                <input type="hidden" id="booking-id">
-                <div class="form-group">
-                    <label for="booking-dog-name">Dog's Name</label>
-                    <input type="text" id="booking-dog-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="booking-dog-breed">Breed</label>
-                    <input type="text" id="booking-dog-breed" required>
-                </div>
-                <div class="form-group">
-                    <label for="booking-dog-age">Age</label>
-                    <input type="number" id="booking-dog-age" min="0" max="30" required>
-                </div>
-                <div class="form-group">
-                    <label for="booking-service">Service</label>
-                    <select id="booking-service" required>
-                        <option value="">Select a service</option>
-                        <option value="Daily Walk (30 min)">Daily Walk (30 min) - $25</option>
-                        <option value="Daily Walk (60 min)">Daily Walk (60 min) - $35</option>
-                        <option value="Pet Sitting">Pet Sitting - $40</option>
-                        <option value="Emergency Visit">Emergency Visit - $50</option>
-                        <option value="Other">Other - Contact for pricing</option>
-                    </select>
-                </div>
-                <div class="form-row">
+
+            <!-- Booking Form Section -->
+            <div id="booking-form-section">
+                <form id="booking-form">
+                    <input type="hidden" id="booking-id">
                     <div class="form-group">
-                        <label for="booking-date">Date</label>
-                        <input type="date" id="booking-date" required>
+                        <label for="booking-dog-name">Dog's Name</label>
+                        <input type="text" id="booking-dog-name" required>
                     </div>
                     <div class="form-group">
-                        <label for="booking-time">Time</label>
-                        <input type="time" id="booking-time" required>
+                        <label for="booking-dog-breed">Breed</label>
+                        <input type="text" id="booking-dog-breed" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-dog-age">Age</label>
+                        <input type="number" id="booking-dog-age" min="0" max="30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-service">Service</label>
+                        <select id="booking-service" required>
+                            <option value="">Select a service</option>
+                            <option value="Daily Walk (30 min)">Daily Walk (30 min) - $25</option>
+                            <option value="Daily Walk (60 min)">Daily Walk (60 min) - $35</option>
+                            <option value="Pet Sitting">Pet Sitting - $40</option>
+                            <option value="Emergency Visit">Emergency Visit - $50</option>
+                            <option value="Other">Other - Contact for pricing</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="booking-date">Date</label>
+                            <input type="date" id="booking-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="booking-time">Time</label>
+                            <input type="time" id="booking-time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-duration">Duration (minutes)</label>
+                        <input type="number" id="booking-duration" min="15" max="480" value="30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-notes">Special Notes</label>
+                        <textarea id="booking-notes" rows="3" placeholder="Any special instructions or requirements..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-minimal">Continue to Payment</button>
+                        <button type="button" id="cancel-booking-btn" class="btn-minimal btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Payment Section (shown after booking created) -->
+            <div id="payment-section" class="hidden">
+                <div class="payment-summary">
+                    <h3>Payment Details</h3>
+                    <div class="summary-item">
+                        <span>Service:</span>
+                        <span id="payment-service"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Date & Time:</span>
+                        <span id="payment-datetime"></span>
+                    </div>
+                    <div class="summary-item summary-total">
+                        <span>Total Amount:</span>
+                        <span id="payment-amount">$0.00</span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="booking-duration">Duration (minutes)</label>
-                    <input type="number" id="booking-duration" min="15" max="480" value="30" required>
+
+                <div class="payment-form">
+                    <div id="payment-element" class="payment-element">
+                        <!-- Stripe Payment Element will be inserted here -->
+                    </div>
+                    <div id="payment-errors" class="payment-errors" role="alert"></div>
+                    <div id="payment-message" class="payment-message" role="status"></div>
+                    <div class="form-actions">
+                        <button id="submit-payment" class="btn-minimal">
+                            <span id="button-text">Pay Now</span>
+                            <span id="spinner" class="spinner hidden"></span>
+                        </button>
+                        <button type="button" id="cancel-payment-btn" class="btn-minimal btn-secondary">Cancel</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="booking-notes">Special Notes</label>
-                    <textarea id="booking-notes" rows="3" placeholder="Any special instructions or requirements..."></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn-minimal">Save Booking</button>
-                    <button type="button" id="cancel-booking-btn" class="btn-minimal btn-secondary">Cancel</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
