@@ -43,12 +43,14 @@ Empire State Walkers is a modern, full-stack web application for a professional 
 - 🔐 **Secure Authentication** - JWT-based auth with bcrypt password hashing
 - ✅ **Input Validation** - Comprehensive server-side validation with express-validator
 - 📅 **Booking System** - Full CRUD operations with automated pricing and status tracking
+- 💳 **Payment Processing** - Stripe integration with multiple payment methods (cards, Apple Pay, Google Pay)
 - 👤 **User Dashboard** - Personalized booking management with create, edit, and cancel capabilities
-- 👑 **Admin Dashboard** - Comprehensive admin interface with booking oversight and contact message management
+- 👑 **Admin Dashboard** - Comprehensive admin interface with booking oversight, payment management, and refund processing
 - 📊 **Real-time Statistics** - Live booking stats with status breakdowns (pending, confirmed, completed)
 - 📧 **Contact Management** - Integrated contact form with admin tracking and status updates
 - 🛡️ **Rate Limiting** - Brute-force protection on all endpoints
 - 🔒 **Role-Based Access** - User and admin roles with protected routes
+- 🔔 **Webhook Integration** - Real-time payment status updates via Stripe webhooks
 
 ### Services Offered
 | Service | Duration | Price |
@@ -75,6 +77,7 @@ Empire State Walkers is a modern, full-stack web application for a professional 
 - 📊 **Statistics Overview** - Real-time cards showing total, pending, confirmed, and completed bookings
 - 📋 **All Bookings View** - See bookings from all users with filtering by status
 - ✅ **Status Management** - Update booking status (pending → confirmed → completed)
+- 💳 **Payment Management** - View payment status, process refunds, and track payment methods
 - 🔍 **Detailed Views** - Modal dialogs with comprehensive booking and customer information
 - 💬 **Contact Messages** - View and manage contact form submissions with status tracking
 - 🗂️ **Tab Navigation** - Switch between bookings and messages tabs
@@ -112,6 +115,10 @@ python3 -m http.server 8080
 - **Admin Dashboard:** Navigate to `http://localhost:8080/admin.html` (requires admin role)
 - **Make user admin:** See [Database](#-database) section for MongoDB command
 
+**Payment Testing (Optional):**
+- For payment features, see [stripe_test_instructions.md](stripe_test_instructions.md)
+- Test card: `4242 4242 4242 4242` (any future date, any CVC)
+
 ## 🛠 Technology Stack
 
 ### Frontend
@@ -128,6 +135,7 @@ python3 -m http.server 8080
 - **Mongoose** - MongoDB ODM
 - **JWT** - Token-based authentication
 - **bcryptjs** - Password hashing (10 salt rounds)
+- **Stripe** - Payment processing (v14+)
 - **express-validator** - Input validation and sanitization
 - **express-rate-limit** - Rate limiting middleware
 - **helmet** - Security headers
@@ -170,6 +178,12 @@ JWT_EXPIRE=30d
 
 # CORS Configuration
 CORS_ORIGIN=http://localhost:8080
+
+# Stripe Payment Configuration
+STRIPE_SECRET_KEY=sk_test_...              # Stripe secret API key
+STRIPE_PUBLISHABLE_KEY=pk_test_...         # Stripe publishable key
+STRIPE_WEBHOOK_SECRET=whsec_...            # Webhook signing secret
+CURRENCY=usd                               # Default currency
 ```
 
 ### Step 3: Database Setup
@@ -212,6 +226,25 @@ python3 -m http.server 8080
 
 Navigate to `http://localhost:8080`
 
+### Step 6: Payment Setup (Optional)
+
+To enable Stripe payment processing:
+
+1. **Create a Stripe account** at [stripe.com](https://stripe.com)
+2. **Get your test API keys** from the [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys)
+3. **Update backend `.env`** with your keys:
+   ```env
+   STRIPE_SECRET_KEY=sk_test_your_key_here
+   STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
+   STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+   ```
+4. **Update frontend** `frontend-api.js` (line 27) with your publishable key
+5. **Restart servers** to apply changes
+
+For detailed setup instructions, see [stripe_test_instructions.md](stripe_test_instructions.md)
+
+For complete payment integration documentation, see [Documentation/STRIPE_INTEGRATION.md](Documentation/STRIPE_INTEGRATION.md)
+
 ## 📡 API Endpoints
 
 ### Authentication (`/api/auth`)
@@ -238,6 +271,17 @@ Navigate to `http://localhost:8080`
 | POST | `/api/contact` | No | Submit contact form |
 | GET | `/api/contact` | Admin | Get all messages |
 | PUT | `/api/contact/:id` | Admin | Update message status |
+
+### Payments (`/api/payments`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/payments/create-intent/:bookingId` | Yes | Create payment intent |
+| POST | `/api/payments/webhook` | No* | Handle Stripe webhooks |
+| GET | `/api/payments/status/:bookingId` | Yes | Get payment status |
+| POST | `/api/payments/refund/:bookingId` | Admin | Issue refund |
+| POST | `/api/payments/confirm/:bookingId` | Admin | Confirm payment |
+
+*Webhook endpoint uses Stripe signature verification
 
 ### Health
 | Method | Endpoint | Auth | Description |
@@ -272,6 +316,9 @@ For detailed API documentation, see [backend/README.md](backend/README.md)
 - user (ref), dogName, dogBreed, service
 - date, time, duration, specialInstructions
 - status (pending/confirmed/completed/cancelled), price
+- paymentStatus (pending/processing/succeeded/failed/refunded)
+- stripePaymentIntentId, paymentMethod, amountPaid, currency
+- refundAmount, refundReason, paidAt
 
 **Contact Schema**
 - name, email, phone, message
@@ -358,15 +405,31 @@ All endpoints enforce strict validation:
 
 ## 🚢 Deployment
 
-### Backend Deployment
+### AWS Deployment (Recommended)
 
-**Recommended Platforms:**
+For production deployment on AWS, see the comprehensive **[AWS Deployment Guide](AWS_DEPLOYMENT_GUIDE.md)** which covers:
+- **ECS Fargate** - Serverless containers with auto-scaling (Recommended)
+- **Elastic Beanstalk** - Platform-as-a-Service deployment
+- **EC2 Instances** - Traditional server deployment
+- **Lambda + API Gateway** - Serverless architecture
+
+The guide includes step-by-step instructions for:
+- VPC and networking setup
+- Database configuration (DocumentDB/MongoDB Atlas)
+- Load balancer and SSL/TLS setup
+- CI/CD pipeline with GitHub Actions
+- Security best practices and IAM roles
+- Cost optimization (~$327/month estimated)
+- Monitoring and logging with CloudWatch
+
+### Alternative Backend Platforms
+
 - **Railway** - Modern platform with MongoDB support
 - **Render** - Free tier available
 - **Heroku** - With MongoDB Atlas integration
 - **DigitalOcean** - VPS with full control
 
-**Production Environment Variables:**
+### Production Environment Variables
 ```env
 NODE_ENV=production
 PORT=5001
@@ -374,9 +437,17 @@ MONGODB_URI=your_production_mongodb_uri
 JWT_SECRET=strong_production_secret_key
 JWT_EXPIRE=30d
 CORS_ORIGIN=https://your-production-domain.com
+
+# Stripe Production Keys
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-⚠️ **Important:** Always update `CORS_ORIGIN` to match your production frontend URL
+⚠️ **Important:**
+- Always update `CORS_ORIGIN` to match your production frontend URL
+- Use Stripe **live keys** (not test keys) in production
+- Enable webhook signature verification
 
 ### Frontend Deployment
 
@@ -384,7 +455,7 @@ CORS_ORIGIN=https://your-production-domain.com
 - **Netlify** - Easy static site deployment
 - **Vercel** - Optimized for frontend
 - **GitHub Pages** - Free hosting
-- **AWS S3 + CloudFront** - Enterprise CDN
+- **AWS S3 + CloudFront** - Enterprise CDN (covered in AWS guide)
 
 ## 🔧 Troubleshooting
 
@@ -428,7 +499,8 @@ empirestatewalkers/
 │   ├── controllers/
 │   │   ├── authController.js   # Authentication logic
 │   │   ├── bookingController.js # Booking CRUD operations
-│   │   └── contactController.js # Contact form handling
+│   │   ├── contactController.js # Contact form handling
+│   │   └── paymentController.js # Stripe payment processing
 │   ├── middleware/
 │   │   ├── auth.js             # JWT authentication & authorization
 │   │   ├── errorHandler.js     # Global error handler
@@ -436,24 +508,56 @@ empirestatewalkers/
 │   │   └── validateObjectId.js # MongoDB ObjectId validator
 │   ├── models/
 │   │   ├── User.js             # User schema
-│   │   ├── Booking.js          # Booking schema
+│   │   ├── Booking.js          # Booking schema (with payment fields)
 │   │   └── Contact.js          # Contact schema
 │   ├── routes/
 │   │   ├── authRoutes.js       # Auth endpoints with rate limiting
 │   │   ├── bookingRoutes.js    # Booking endpoints with validation
-│   │   └── contactRoutes.js    # Contact endpoints
+│   │   ├── contactRoutes.js    # Contact endpoints
+│   │   └── paymentRoutes.js    # Payment endpoints with webhooks
 │   ├── utils/
 │   │   └── generateToken.js    # JWT token generator
 │   ├── .env.example            # Environment variables template
 │   ├── package.json            # Backend dependencies
 │   ├── server.js               # Express server entry point
 │   └── README.md               # Backend documentation
+├── Documentation/
+│   ├── STRIPE_INTEGRATION.md   # Payment setup guide
+│   └── AWS_DEPLOYMENT_GUIDE.md # AWS deployment instructions
+├── Changelogs/November/
+│   ├── ChangeLogNov11.md       # Backend config & admin fixes
+│   └── ChangeLogNov12.md       # Stripe & AWS deployment docs
+├── stripe_test_instructions.md # Quick Stripe testing guide
 └── README.md                   # This file
 ```
 
 ## 🔄 Recent Updates
 
-### November 2025: Comprehensive Dashboard Implementation
+### November 12, 2025: Stripe Payment Integration & AWS Deployment
+- ✅ **Payment Processing** - Full Stripe integration with PCI DSS compliance
+  - Payment controller with intent creation, webhook handling, and refunds
+  - Multiple payment methods (cards, Apple Pay, Google Pay, ACH, SEPA)
+  - Real-time payment status updates via webhooks
+  - Booking model extended with payment tracking fields
+  - Admin dashboard refund management
+- ✅ **AWS Deployment Guide** - Comprehensive deployment documentation (1,505 lines)
+  - ECS Fargate, Elastic Beanstalk, EC2, and Lambda deployment options
+  - Production architecture with auto-scaling and load balancing
+  - Security best practices and IAM configuration
+  - CI/CD pipeline setup with GitHub Actions
+  - Cost optimization strategies (~$327/month estimated)
+  - Disaster recovery and backup procedures
+- ✅ **Testing Documentation** - Stripe test card numbers and webhook testing guide
+- ✅ **Frontend Integration** - Payment modal with Stripe Elements and card validation
+
+### November 11, 2025: Backend Configuration & Admin Panel Fixes
+- ✅ **CORS Configuration** - Added localhost:8000 support for development
+- ✅ **CSRF Protection** - Disabled in development mode for easier testing
+- ✅ **Booking Model Updates** - Changed duration from enum to Number, added dogAge and notes fields
+- ✅ **MongoDB Setup** - Verified database connection and admin user configuration
+- ✅ **Admin Panel Access** - Resolved blocking issues preventing admin dashboard usage
+
+### Earlier November 2025: Dashboard & Security Enhancements
 - ✅ **User Dashboard** - Full booking management with create, edit, and cancel capabilities
 - ✅ **Admin Dashboard** - Complete admin interface at `/admin.html` with:
   - Real-time statistics (total, pending, confirmed, completed bookings)
@@ -461,36 +565,37 @@ empirestatewalkers/
   - Booking status management workflow
   - Contact message tracking with status updates
   - Tab-based navigation between bookings and messages
-- ✅ **Enhanced UI** - Modal dialogs, status badges, and responsive design
-- ✅ **XSS Protection** - Secure DOM manipulation throughout
-- ✅ **Date Validation** - Prevention of past-date bookings
-
-### November 2025: Security Hardening & Production Readiness
-- ✅ Fixed all HIGH severity security vulnerabilities (100% elimination)
-- ✅ Upgraded to secure dependency versions (helmet 8.1.0, winston 3.18.3, csrf-sync 4.2.1)
-- ✅ Added comprehensive logging with Winston
-- ✅ Implemented HTTP request logging with Morgan
-- ✅ Enhanced rate limiting configuration
-- ✅ Fixed registration bug with password validation standardization
-- ✅ Changed default port from 5000 to 5001 (macOS AirPlay compatibility)
-- ✅ Added MongoDB query examples and database management guide
-- ✅ Improved error messages and validation feedback
+- ✅ **Security Hardening** - Fixed all HIGH severity vulnerabilities
+- ✅ **Upgraded Dependencies** - helmet 8.1.0, winston 3.18.3, csrf-sync 4.2.1
+- ✅ **Enhanced Logging** - Winston and Morgan integration
+- ✅ **Port Change** - Default port from 5000 to 5001 (macOS AirPlay compatibility)
 
 ## 🚧 Future Enhancements
 
+### Payment Features
+- [ ] Subscription billing for recurring services
+- [ ] Promotional codes and discount support
+- [ ] Multi-currency support with automatic detection
+- [ ] Payment analytics and revenue reporting
+
+### Communication
 - [ ] Email notifications (SendGrid/Nodemailer)
-- [ ] Payment processing (Stripe integration)
 - [ ] SMS notifications (Twilio)
+- [ ] Push notifications for mobile
+
+### Features
 - [ ] Photo upload for pet profiles (AWS S3)
+- [ ] Walk tracking with GPS
+- [ ] Review and rating system
+- [ ] Calendar view for bookings
+- [ ] Export booking data (CSV/PDF)
 - [ ] Real-time updates (Socket.io)
+
+### Technical Improvements
 - [ ] Automated testing suite (Jest/Mocha)
 - [ ] API documentation (Swagger/OpenAPI)
 - [ ] Caching with Redis
-- [ ] Walk tracking with GPS
-- [ ] Review and rating system
-- [ ] Push notifications
-- [ ] Calendar view for bookings
-- [ ] Export booking data (CSV/PDF)
+- [ ] Multi-region deployment for global availability
 
 ## 🤝 Contributing
 
